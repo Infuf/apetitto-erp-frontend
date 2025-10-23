@@ -1,0 +1,14 @@
+services:
+  frontend:
+    build:
+      context: .
+    container_name: apetitto-erp-frontend
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - apetitto-net
+
+networks:
+  apetitto-net:
+    external: true
