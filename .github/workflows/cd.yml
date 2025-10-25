@@ -1,0 +1,57 @@
+name: CD - Deploy frontend to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image tag or digest to deploy (e.g., latest, v1.0.0, sha256:abcd...)'
+        required: true
+        default: 'latest'
+      reason:
+        description: 'Reason for deployment (optional)'
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            
+            REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+            IMAGE_NAME="ghcr.io/${REPO_LOWER}"
+            VERSION="${{ github.event.inputs.version }}"
+            
+            echo "🚀 Deploying image ${IMAGE_NAME} with version ${VERSION}"
+            
+            cd ~/apetitto-erp
+            
+            echo "🔐 Logging into GHCR..."
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            
+            echo "🧩 Updating image in docker-compose.yml..."
+            if [[ "$VERSION" == sha256:* ]]; then
+              echo "✅ Using digest: ${VERSION}"
+              sed -i "s|^    image: ${IMAGE_NAME}.*|    image: ${IMAGE_NAME}@${VERSION}|" docker-compose.yml
+            else
+              echo "✅ Using tag: ${VERSION}"
+              sed -i "s|^    image: ${IMAGE_NAME}.*|    image: ${IMAGE_NAME}:${VERSION}|" docker-compose.yml
+            fi
+            
+            echo "🐳 Pulling new image..."
+            docker compose pull frontend
+            
+            echo "🔁 Restarting frontend service..."
+            docker compose up -d --no-deps frontend
+            
+            echo "🧹 Cleaning up old images..."
+            docker image prune -f --filter "until=24h"
+            
+            echo "✅ Deployment finished successfully!"
