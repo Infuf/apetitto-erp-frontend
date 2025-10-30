@@ -21,6 +21,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 
 const drawerWidth = 240;
 import {funnyTitles} from '../constants/titles';
@@ -85,7 +86,8 @@ const directoryItems = [
 
 const operationsItems = [
     {text: 'Остатки на складе', path: '/stock', icon: <AssessmentIcon/>},
-    {text: 'Складские операции', path: '/movements', icon: <SyncAltIcon/>}
+    {text: 'Складские операции', path: '/movements', icon: <SyncAltIcon/>},
+    {text: 'Перемещения', path: '/transfers', icon: <CompareArrowsIcon/>}
 ];
 
 export const Layout = () => {
@@ -138,10 +140,6 @@ export const Layout = () => {
                         onClick={handleChangeTitle}
                     >
                         {title}
-                    </Typography>
-                    <Box sx={{flexGrow: 1}}/>
-                    <Typography component="h1" variant="h6" color="inherit" noWrap sx={{flexGrow: 1}}>
-                        Apetitto ERP
                     </Typography>
                     <Typography sx={{mr: 2}}>{user?.username}</Typography>
                     <Button color="inherit" onClick={handleLogout}>Выход</Button>
