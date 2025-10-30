@@ -119,7 +119,7 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
     const quantityLabel = movementType === 'ADJUSTMENT' ? 'Изменение (+/-)' : 'Кол-во';
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+        <Dialog open={open} maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting} >
             <DialogTitle>{formTitles[movementType]}</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', gap: 2, mt: 2, mb: 3 }}>

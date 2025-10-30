@@ -9,6 +9,10 @@ import {ProductsPage} from "../features/product/ProductPage.tsx";
 import {StockPage} from "../features/stock/StockPage.tsx";
 import {MovementsPage} from "../features/movements/MovementPage.tsx";
 import {RegisterPage} from "../features/auth/RegisterPage.tsx";
+// import {CreateTransferPage} from "../features/transfers/CreateTransferPage.tsx";
+import {TransfersPage} from "../features/transfers/TransfersPage.tsx";
+import {TransferDetailPage} from "../features/transfers/TransfersDetailsl.tsx";
+// import {TransferDetailPage} from "../features/transfers/TransfersDetailPage.tsx";
 
 export const AppRoutes = () => {
     return (
@@ -24,6 +28,9 @@ export const AppRoutes = () => {
                     <Route path="/categories" element={<CategoriesPage/>}/>
                     <Route path="/products" element={<ProductsPage/>}/>
                     <Route path="/movements" element={<MovementsPage/>}/>
+                    <Route path="/transfers" element={<TransfersPage/>}/>
+                    {/*<Route path="/transfers/create" element={<CreateTransferPage/>}/>*/}
+                    <Route path="/transfers/:id" element={<TransferDetailPage/>}/>
                     <Route path="/stock" element={<StockPage/>}/>
                 </Route>
             </Route>
