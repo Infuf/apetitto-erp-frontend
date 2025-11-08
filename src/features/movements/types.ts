@@ -49,7 +49,7 @@ export interface MovementHistoryItem {
     id: number;
     warehouseId: number;
     warehouseName: string;
-    movementType: 'INBOUND' | 'OUTBOUND' | 'TRANSFER_OUT' | 'TRANSFER_IN' | 'ADJUSTMENT';
+    movementType: 'INBOUND' | 'OUTBOUND' | 'TRANSFER_OUT' | 'TRANSFER_IN' | 'ADJUSTMENT' | 'SELL';
     movementTime: string;
     comment?: string;
     items: { productId: number; quantity: number; costPrice?: number }[];

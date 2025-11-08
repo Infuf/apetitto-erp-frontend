@@ -12,6 +12,7 @@ import {formatAppDate} from '../../lib/formatDate';
 import {TransferDetailsModal} from './TransferDetailsModal';
 import {TransferForm} from './TransferForm';
 import type {TransferOrder, TransferFilters, TransferOrderRequestDto} from './types';
+import {toIsoUtc} from "../../helpers/dateToIsoUtc.ts";
 
 const statusInfo: Record<TransferOrder['status'], {
     label: string;
@@ -41,7 +42,11 @@ export const TransfersDesktopPage = () => {
 
     const handleApplyFilters = () => {
         setPaginationModel(prev => ({...prev, page: 0}));
-        setActiveFilters(filterInputs);
+        setActiveFilters({
+            ...filterInputs,
+            dateFrom: toIsoUtc(filterInputs.dateFrom, false),
+            dateTo: toIsoUtc(filterInputs.dateTo, true)
+        });
     };
 
     const handleFormSubmit = (formData: TransferOrderRequestDto) => {
