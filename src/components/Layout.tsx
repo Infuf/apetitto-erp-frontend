@@ -22,9 +22,11 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import {Can} from './Can.tsx';
+import {funnyTitles} from '../constants/titles';
 
 const drawerWidth = 240;
-import {funnyTitles} from '../constants/titles';
 
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
@@ -79,15 +81,46 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 );
 
 const directoryItems = [
-    {text: 'Товары', path: '/products', icon: <InventoryIcon/>},
-    {text: 'Категории', path: '/categories', icon: <CategoryIcon/>},
-    {text: 'Склады', path: '/warehouses', icon: <WarehouseIcon/>},
+    {
+        text: 'Товары', path: '/products', icon: <InventoryIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+    },
+    {
+        text: 'Категории', path: '/categories', icon: <CategoryIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+    },
+    {
+        text: 'Склады', path: '/warehouses', icon: <WarehouseIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+    },
 ];
 
 const operationsItems = [
-    {text: 'Остатки на складе', path: '/stock', icon: <AssessmentIcon/>},
-    {text: 'Складские операции', path: '/movements', icon: <SyncAltIcon/>},
-    {text: 'Перемещения', path: '/transfers', icon: <CompareArrowsIcon/>}
+    {
+        text: 'Остатки на складе',
+        path: '/stock',
+        icon: <AssessmentIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+    },
+    {
+        text: 'Складские операции',
+        path: '/movements',
+        icon: <SyncAltIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+    },
+    {
+        text: 'Перемещения',
+        path: '/transfers',
+        icon: <CompareArrowsIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER', 'ROLE_STORE_MANAGER']
+    },
+];
+
+const adminItems = [
+    {
+        text: 'Пользователи', path: '/admin/users', icon: <SupervisorAccountIcon/>,
+        roles: ['ROLE_ADMIN']
+    },
 ];
 
 export const Layout = () => {
@@ -154,37 +187,57 @@ export const Layout = () => {
                 </Toolbar>
                 <List component="nav">
                     {operationsItems.map((item) => (
-                        <ListItemButton
-                            key={item.text}
-                            component={NavLink}
-                            to={item.path}
-                            sx={{'&.active': {backgroundColor: 'action.selected'}}}
-                        >
-                            <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText primary={item.text}/>
-                        </ListItemButton>
+                        <Can allowedRoles={item.roles} key={item.text}>
+                            <ListItemButton
+                                key={item.text}
+                                component={NavLink}
+                                to={item.path}
+                                sx={{'&.active': {backgroundColor: 'action.selected'}}}
+                            >
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text}/>
+                            </ListItemButton>
+                        </Can>
                     ))}
                     <Divider sx={{my: 1}}/>
-                    <ListItemButton onClick={handleDirectoryClick}>
-                        <ListItemIcon><FolderIcon/></ListItemIcon>
-                        <ListItemText primary="Справочники"/>
-                        {openDirectory ? <ExpandLess/> : <ExpandMore/>}
-                    </ListItemButton>
+                    <Can allowedRoles={['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']}>
+                        <ListItemButton onClick={handleDirectoryClick}>
+                            <ListItemIcon><FolderIcon/></ListItemIcon>
+                            <ListItemText primary="Справочники"/>
+                            {openDirectory ? <ExpandLess/> : <ExpandMore/>}
+                        </ListItemButton>
+                    </Can>
                     <Collapse in={openDirectory} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
                             {directoryItems.map((item) => (
-                                <ListItemButton
-                                    key={item.text}
-                                    component={NavLink}
-                                    to={item.path}
-                                    sx={{pl: 4, '&.active': {backgroundColor: 'action.selected'}}}
-                                >
-                                    <ListItemIcon>{item.icon}</ListItemIcon>
-                                    <ListItemText primary={item.text}/>
-                                </ListItemButton>
+                                <Can allowedRoles={item.roles} key={item.text}>
+                                    <ListItemButton
+                                        key={item.text}
+                                        component={NavLink}
+                                        to={item.path}
+                                        sx={{pl: 4, '&.active': {backgroundColor: 'action.selected'}}}
+                                    >
+                                        <ListItemIcon>{item.icon}</ListItemIcon>
+                                        <ListItemText primary={item.text}/>
+                                    </ListItemButton>
+                                </Can>
                             ))}
                         </List>
                     </Collapse>
+                    <Divider sx={{my: 1}}/>
+                    {adminItems.map((item) => (
+                        <Can allowedRoles={item.roles} key={item.text}>
+                            <ListItemButton
+                                key={item.text}
+                                component={NavLink}
+                                to={item.path}
+                                sx={{'&.active': {backgroundColor: 'action.selected'}}}
+                            >
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text}/>
+                            </ListItemButton>
+                        </Can>
+                    ))}
                 </List>
             </Drawer>
 
@@ -195,5 +248,6 @@ export const Layout = () => {
                 </Box>
             </Box>
         </Box>
-    );
+    )
+        ;
 };
