@@ -1,18 +1,17 @@
-import {Route, Routes, Navigate} from 'react-router-dom';
+import {Route, Routes} from 'react-router-dom';
 
 import {ProtectedRoute} from './ProtectedRoute';
 import {Layout} from '../components/Layout';
 import {LoginPage} from '../features/auth/LoginPage';
 import {WarehousesPage} from '../features/warehouses/WarehousesPage';
-import {CategoriesPage} from "../features/categories/CategoryPage.tsx";
-import {ProductsPage} from "../features/product/ProductPage.tsx";
-import {StockPage} from "../features/stock/StockPage.tsx";
-import {MovementsPage} from "../features/movements/MovementPage.tsx";
-import {RegisterPage} from "../features/auth/RegisterPage.tsx";
-// import {CreateTransferPage} from "../features/transfers/CreateTransferPage.tsx";
-import {TransfersPage} from "../features/transfers/TransfersPage.tsx";
-import {TransferDetailPage} from "../features/transfers/TransfersDetailsl.tsx";
-// import {TransferDetailPage} from "../features/transfers/TransfersDetailPage.tsx";
+import {CategoriesPage} from "../features/categories/CategoryPage";
+import {ProductsPage} from "../features/product/ProductPage";
+import {StockPage} from "../features/stock/StockPage";
+import {MovementsPage} from "../features/movements/MovementPage";
+import {RegisterPage} from "../features/auth/RegisterPage";
+import {TransfersPage} from "../features/transfers/TransfersPage";
+import {TransferDetailPage} from "../features/transfers/TransfersDetailsl";
+import {UsersPage} from "../features/admin/users/UsersPage";
 
 export const AppRoutes = () => {
     return (
@@ -23,15 +22,20 @@ export const AppRoutes = () => {
 
             <Route element={<ProtectedRoute/>}>
                 <Route element={<Layout/>}>
-                    <Route path="/" element={<Navigate to="/warehouses"/>}/>
+
+                    <Route path="/"/>
                     <Route path="/warehouses" element={<WarehousesPage/>}/>
                     <Route path="/categories" element={<CategoriesPage/>}/>
                     <Route path="/products" element={<ProductsPage/>}/>
-                    <Route path="/movements" element={<MovementsPage/>}/>
-                    <Route path="/transfers" element={<TransfersPage/>}/>
-                    {/*<Route path="/transfers/create" element={<CreateTransferPage/>}/>*/}
-                    <Route path="/transfers/:id" element={<TransferDetailPage/>}/>
                     <Route path="/stock" element={<StockPage/>}/>
+                    <Route path="/movements" element={<MovementsPage/>}/>
+
+
+                    <Route path="/transfers" element={<TransfersPage/>}/>
+                    <Route path="/transfers/:id" element={<TransferDetailPage/>}/>
+
+                    <Route path="/admin/users" element={<UsersPage/>}/>
+
                 </Route>
             </Route>
         </Routes>
