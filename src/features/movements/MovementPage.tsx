@@ -26,7 +26,7 @@ const fetchMovementHistory = async (
     filters: { warehouseId: number | null; dateFrom?: string | null; dateTo?: string | null }
 ): Promise<MovementsPageResponse> => {
 
-    const { warehouseId, dateFrom, dateTo } = filters;
+    const {warehouseId, dateFrom, dateTo} = filters;
 
     const params: Record<string, string | number | undefined> = {
         page: paginationModel.page,
@@ -50,7 +50,7 @@ const fetchMovementHistory = async (
         }
     }
 
-    const { data } = await axiosInstance.get<MovementsPageResponse>('/warehouse/movements/history', { params });
+    const {data} = await axiosInstance.get<MovementsPageResponse>('/warehouse/movements/history', {params});
     return data;
 };
 
@@ -69,13 +69,13 @@ const movementTypeLabels: Record<MovementHistoryItem['movementType'], string> = 
 };
 
 const renderMovementType = (type: MovementHistoryItem['movementType']) => {
-    const colorMap: Record<typeof type, 'success' | 'error' | 'warning' | 'info' | 'primary'> = {
+    const colorMap: Record<typeof type, 'success' | 'error' | 'warning' | 'info' | 'primary' | 'secondary'> = {
         INBOUND: 'success',
         OUTBOUND: 'error',
         ADJUSTMENT: 'warning',
         TRANSFER_IN: 'info',
         TRANSFER_OUT: 'primary',
-        SELL: 'primary',
+        SELL: 'secondary',
     };
     return <Chip label={movementTypeLabels[type]} color={colorMap[type]} size="small"/>;
 };
