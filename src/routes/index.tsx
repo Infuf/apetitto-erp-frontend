@@ -12,7 +12,9 @@ import {RegisterPage} from "../features/auth/RegisterPage";
 import {TransfersPage} from "../features/transfers/TransfersPage";
 import {TransferDetailPage} from "../features/transfers/TransfersDetailsl";
 import {UsersPage} from "../features/admin/users/UsersPage";
-
+import {FinanceAccountsPage} from "../features/finance/accounts/FinanceAccountsPage.tsx";
+import {CategoriesPage as FinanceCategoriesPage} from '../features/finance/categories/CategoryPage.tsx';
+import { FinancePage } from '../features/finance/FinancePage.tsx';
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -33,6 +35,10 @@ export const AppRoutes = () => {
 
                     <Route path="/transfers" element={<TransfersPage/>}/>
                     <Route path="/transfers/:id" element={<TransferDetailPage/>}/>
+
+                    <Route path="/finance/transactions" element={<FinancePage />} />
+                    <Route path="/finance/accounts" element={<FinanceAccountsPage/>}/>
+                    <Route path="/finance/categories" element={<FinanceCategoriesPage/>}/>
 
                     <Route path="/admin/users" element={<UsersPage/>}/>
 

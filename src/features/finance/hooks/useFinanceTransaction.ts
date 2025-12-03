@@ -1,0 +1,56 @@
+import {useQuery, useMutation, useQueryClient, keepPreviousData} from '@tanstack/react-query';
+import {axiosInstance} from '../../../api/axiosInstance';
+import type {
+    PageTransactionResponseDto,
+    TransactionCreateRequestDto,
+    TransactionResponseDto,
+    FinanceFilters
+} from '../types';
+
+const fetchTransactions = async (
+    page: number,
+    size: number,
+    filters: FinanceFilters
+): Promise<PageTransactionResponseDto> => {
+    const {data} = await axiosInstance.get('/finance/transactions', {
+        params: {
+            page,
+            size,
+            sort: 'transactionDate,desc',
+            accountId: filters.accountId,
+            dateFrom: filters.dateFrom,
+            dateTo: filters.dateTo,
+        }
+    });
+    return data;
+};
+
+const createTransaction = async (data: TransactionCreateRequestDto): Promise<TransactionResponseDto> => {
+    const {data: result} = await axiosInstance.post('/finance/transactions', data);
+    return result;
+};
+
+export const useFinanceTransactions = () => {
+    const queryClient = useQueryClient();
+
+    const usePaginatedTransactions = (page: number, pageSize: number, filters: FinanceFilters) =>
+        useQuery({
+            queryKey: ['financeTransactions', page, pageSize, filters],
+            queryFn: () => fetchTransactions(page, pageSize, filters),
+            placeholderData: keepPreviousData,
+            enabled: !!filters.accountId,
+        });
+
+    const createMutation = useMutation({
+        mutationFn: createTransaction,
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['financeTransactions']});
+            queryClient.invalidateQueries({queryKey: ['financeAccounts']});
+        },
+    });
+
+    return {
+        usePaginatedTransactions,
+        createTransaction: createMutation,
+    };
+};
