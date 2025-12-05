@@ -165,7 +165,7 @@ export const FinancePage = () => {
     return (
         <Box>
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-                <Typography variant="h4" component="h1">Финансы</Typography>
+                <Typography variant="h4" component="h1">Где бабки Любовский?</Typography>
                 <ButtonGroup variant="contained">
                     <Button color="success" startIcon={<AddIcon/>} onClick={() => setModalType('INCOME')}>Доход</Button>
                     <Button color="error" startIcon={<RemoveIcon/>}
