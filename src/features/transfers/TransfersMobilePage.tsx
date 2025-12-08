@@ -13,7 +13,7 @@ const statusInfo: Record<TransferOrder['status'], { label: string; color: 'defau
 
 export const TransfersMobilePage = () => {
     const navigate = useNavigate();
-    const { useInfiniteTransfers, receive } = useTransfers();
+    const { useInfiniteTransfers, } = useTransfers();
 
     const {
         data,
@@ -24,13 +24,6 @@ export const TransfersMobilePage = () => {
         isFetching,
         isLoading,
     } = useInfiniteTransfers();
-
-    const handleReceive = (e: React.MouseEvent, id: number) => {
-        e.stopPropagation();
-        if (window.confirm(`Вы уверены, что хотите принять перемещение #${id}?`)) {
-            receive.mutate(id);
-        }
-    };
 
     if (isLoading) {
         return <CircularProgress />;
@@ -72,19 +65,6 @@ export const TransfersMobilePage = () => {
                                 </Typography>
                             </CardContent>
                         </CardActionArea>
-                        {transfer.status === 'SHIPPED' && (
-                            <Box sx={{ p: 2, pt: 0 }}>
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    fullWidth
-                                    onClick={(e) => handleReceive(e, transfer.id)}
-                                    disabled={receive.isPending}
-                                >
-                                    {receive.isPending && receive.variables === transfer.id ? <CircularProgress size={24} /> : 'Принять'}
-                                </Button>
-                            </Box>
-                        )}
                     </Card>
                 ))}
             </Box>
