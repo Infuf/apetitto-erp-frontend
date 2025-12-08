@@ -25,6 +25,9 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import {Can} from './Can.tsx';
 import {funnyTitles} from '../constants/titles';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'; // Журнал
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'; // Счета
+import ClassIcon from '@mui/icons-material/Class'; // Категории фин.
 
 const drawerWidth = 240;
 
@@ -113,6 +116,26 @@ const operationsItems = [
         path: '/transfers',
         icon: <CompareArrowsIcon/>,
         roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER', 'ROLE_STORE_MANAGER']
+    },
+];
+const financeItems = [
+    {
+        text: 'Бабки',
+        path: '/finance/transactions',
+        icon: <ReceiptLongIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER']
+    },
+    {
+        text: 'Счета и Кассы',
+        path: '/finance/accounts',
+        icon: <AccountBalanceWalletIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER']
+    },
+    {
+        text: 'Статьи (Категории)',
+        path: '/finance/categories',
+        icon: <ClassIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_OWNER']
     },
 ];
 
@@ -225,6 +248,19 @@ export const Layout = () => {
                         </List>
                     </Collapse>
                     <Divider sx={{my: 1}}/>
+
+                    {financeItems.map((item) => (
+                        <Can allowedRoles={item.roles} key={item.text}>
+                            <ListItemButton
+                                component={NavLink}
+                                to={item.path}
+                                sx={{'&.active': {backgroundColor: 'action.selected'}}}
+                            >
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text}/>
+                            </ListItemButton>
+                        </Can>
+                    ))}
                     {adminItems.map((item) => (
                         <Can allowedRoles={item.roles} key={item.text}>
                             <ListItemButton
