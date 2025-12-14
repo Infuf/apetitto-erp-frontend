@@ -1,8 +1,8 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, CircularProgress } from '@mui/material';
-import type { PasswordResetFormData } from './types';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {z} from 'zod';
+import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from '@mui/material';
+import type {PasswordResetFormData} from './types';
 
 const passwordSchema = z.object({
     newPassword: z.string().min(6, 'Пароль должен быть не менее 6 символов'),

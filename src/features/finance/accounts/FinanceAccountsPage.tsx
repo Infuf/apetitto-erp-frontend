@@ -1,7 +1,17 @@
 import {useState} from 'react';
 import {
-    Box, Typography, Button, Card, CardContent, Grid, Chip,
-    Tabs, Tab, IconButton, CircularProgress, Alert
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    CircularProgress,
+    Grid,
+    IconButton,
+    Tab,
+    Tabs,
+    Typography
 } from '@mui/material';
 import {DataGrid, type GridColDef} from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -13,7 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {useFinanceDirectories} from '../hooks/useFinanceDirectories';
 import {AccountForm} from './AccountForm';
 import {formatCurrency} from '../../../lib/formatCurrency';
-import type {FinanceAccount, AccountFormData} from '../types';
+import type {AccountFormData, FinanceAccount} from '../types';
 
 interface TabPanelProps {
     children?: React.ReactNode;

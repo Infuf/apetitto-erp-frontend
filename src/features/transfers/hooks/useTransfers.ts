@@ -1,10 +1,11 @@
-import {useQuery, useMutation, useQueryClient, useInfiniteQuery, keepPreviousData} from '@tanstack/react-query';
+import {keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {axiosInstance} from '../../../api/axiosInstance';
 import type {
+    FetchTransfersParams,
     PageTransferOrderDto,
+    TransferFilters,
     TransferOrder,
-    TransferOrderRequestDto,
-    FetchTransfersParams, TransferFilters
+    TransferOrderRequestDto
 } from '../types';
 
 

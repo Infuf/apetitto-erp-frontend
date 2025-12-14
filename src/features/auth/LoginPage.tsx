@@ -5,16 +5,16 @@ import {useNavigate} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
 import {useState} from 'react';
 import {
+    Alert,
+    Avatar,
     Box,
     Button,
     Card,
     CardContent,
     CircularProgress,
+    Link as MuiLink,
     TextField,
-    Typography,
-    Alert,
-    Avatar,
-    Link as MuiLink
+    Typography
 } from '@mui/material';
 
 import {axiosInstance} from '../../api/axiosInstance.ts';

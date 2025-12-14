@@ -1,6 +1,17 @@
-import {useState, useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {
-    Box, Typography, Button, Paper, TextField, Chip, Autocomplete, ButtonGroup, Card, CardContent, Grid, IconButton
+    Autocomplete,
+    Box,
+    Button,
+    ButtonGroup,
+    Card,
+    CardContent,
+    Chip,
+    Grid,
+    IconButton,
+    Paper,
+    TextField,
+    Typography
 } from '@mui/material';
 import {DataGrid, type GridColDef, type GridPaginationModel} from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,11 +26,11 @@ import {TransactionForm} from './transactions/TransactionsForm.tsx';
 import {formatAppDate} from '../../lib/formatDate';
 import {formatCurrency} from '../../lib/formatCurrency';
 import type {
-    TransactionResponseDto,
-    FinanceFilters,
-    TransactionType,
     FinanceAccount,
-    TransactionCreateRequestDto
+    FinanceFilters,
+    TransactionCreateRequestDto,
+    TransactionResponseDto,
+    TransactionType
 } from './types';
 
 const typeLabels: Record<string, { label: string, color: 'success' | 'error' | 'default' | 'primary' | 'warning' }> = {
@@ -149,6 +160,7 @@ export const FinancePage = () => {
             }
         },
         {field: 'description', headerName: 'Комментарий', flex: 1},
+        {field: 'createdByName', headerName: 'Создан', flex: 1},
         {
             field: 'actions',
             headerName: 'Детали',

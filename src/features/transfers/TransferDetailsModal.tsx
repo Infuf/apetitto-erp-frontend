@@ -1,7 +1,20 @@
 import {
-    Box, Dialog, DialogContent, DialogTitle, IconButton, Typography,
-    CircularProgress, Alert, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Chip,
+    Alert,
+    Box,
+    Chip,
+    CircularProgress,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 

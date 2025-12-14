@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, CircularProgress
-} from '@mui/material';
-import type { Category } from './types';
+import {useEffect} from 'react';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {z} from 'zod';
+import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from '@mui/material';
+import type {Category} from './types';
 
 const categorySchema = z.object({
     name: z.string().min(1, 'Название обязательно для заполнения'),

@@ -1,22 +1,10 @@
-import {useState, useEffect} from 'react';
-import {
-    Box,
-    Typography,
-    Alert,
-    TextField,
-    Autocomplete,
-} from '@mui/material';
-import {
-    DataGrid,
-    type GridColDef,
-    type GridPaginationModel,
-} from '@mui/x-data-grid';
-import {
-    useQuery,
-    keepPreviousData,
-} from '@tanstack/react-query';
+import {useEffect, useState} from 'react';
+import {Alert, Autocomplete, Box, TextField, Typography,} from '@mui/material';
+import {DataGrid, type GridColDef, type GridPaginationModel,} from '@mui/x-data-grid';
+import {keepPreviousData, useQuery,} from '@tanstack/react-query';
 import {axiosInstance} from '../../api/axiosInstance';
-import type {StockItem, StockPageResponse, WarehouseOption, CategoryOption} from './types';
+import type {CategoryOption, StockItem, StockPageResponse, WarehouseOption} from './types';
+import {formatCurrency} from "../../lib/formatCurrency.ts";
 
 
 const fetchStock = async (
@@ -98,7 +86,12 @@ export const StockPage = () => {
         {field: 'productName', headerName: 'Название', flex: 1, minWidth: 200},
         {field: 'quantity', headerName: 'Количество', width: 130},
         {field: 'unit', headerName: 'Ед. изм.', width: 100},
-        {field: 'averageCost', headerName: 'Себестоимость', width: 150},
+        {
+            field: 'averageCost', headerName: 'Цена', width: 120,
+            renderCell: (params) => {
+                return formatCurrency(params.value);
+            }
+        },
     ];
 
     if (isError) {

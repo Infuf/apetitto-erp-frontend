@@ -1,15 +1,32 @@
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import {
-    Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography,
-    TextField, Autocomplete, IconButton, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, CircularProgress
+    Autocomplete,
+    Box,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { axiosInstance } from '../../api/axiosInstance';
-import type { WarehouseOption, ProductOption, MovementItem, MovementType, StockMovementRequestDto } from './types';
+import {axiosInstance} from '../../api/axiosInstance';
+import type {MovementItem, MovementType, ProductOption, StockMovementRequestDto, WarehouseOption} from './types';
+import {formatCurrency} from "../../lib/formatCurrency.ts";
+import {NumericFormat} from "react-number-format";
 
 interface MovementFormProps {
     open: boolean;
@@ -20,13 +37,13 @@ interface MovementFormProps {
 }
 
 const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
-    const { data } = await axiosInstance.get('/warehouses');
+    const {data} = await axiosInstance.get('/warehouses');
     return data;
 };
 
 const searchProducts = async (name: string): Promise<ProductOption[]> => {
     if (!name) return [];
-    const { data } = await axiosInstance.get('/products/search', { params: { name } });
+    const {data} = await axiosInstance.get('/products/search', {params: {name}});
     return data.content || [];
 };
 
@@ -36,7 +53,7 @@ const formTitles: Record<MovementType, string> = {
     ADJUSTMENT: 'Новая корректировка',
 };
 
-export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementType }: MovementFormProps) => {
+export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementType}: MovementFormProps) => {
     const [warehouseId, setWarehouseId] = useState<number | null>(null);
     const [comment, setComment] = useState('');
     const [items, setItems] = useState<MovementItem[]>([]);
@@ -46,12 +63,12 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
     const [quantity, setQuantity] = useState<number | ''>(1);
     const [costPrice, setCostPrice] = useState<number | ''>('');
 
-    const { data: warehouses = [], isLoading: isLoadingWarehouses } = useQuery({
+    const {data: warehouses = [], isLoading: isLoadingWarehouses} = useQuery({
         queryKey: ['warehouses'],
         queryFn: fetchWarehouses,
     });
 
-    const { data: productOptions = [], isLoading: isLoadingProducts } = useQuery({
+    const {data: productOptions = [], isLoading: isLoadingProducts} = useQuery({
         queryKey: ['productSearch', productSearchInput],
         queryFn: () => searchProducts(productSearchInput),
         enabled: !!productSearchInput,
@@ -94,6 +111,7 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
                 productId: selectedProduct.id,
                 quantity: quantity,
                 costPrice: movementType === 'INBOUND' ? costPrice as number : undefined,
+                sellingPrice: movementType === 'OUTBOUND' ? selectedProduct.sellingPrice as number : undefined,
                 productName: selectedProduct.name,
                 productCode: selectedProduct.productCode,
             }];
@@ -111,18 +129,18 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
 
     const handleSubmit = () => {
         if (!warehouseId) return;
-        const itemsToSubmit = items.map(({ productId, quantity, costPrice }) => ({ productId, quantity, costPrice }));
-        onSubmit({ warehouseId, movementType, comment, items: itemsToSubmit });
+        const itemsToSubmit = items.map(({productId, quantity, costPrice}) => ({productId, quantity, costPrice}));
+        onSubmit({warehouseId, movementType, comment, items: itemsToSubmit});
     };
 
     const isSubmitDisabled = !warehouseId || items.length === 0 || isSubmitting;
     const quantityLabel = movementType === 'ADJUSTMENT' ? 'Изменение (+/-)' : 'Кол-во';
 
     return (
-        <Dialog open={open} maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting} >
+        <Dialog open={open} maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting}>
             <DialogTitle>{formTitles[movementType]}</DialogTitle>
             <DialogContent>
-                <Box sx={{ display: 'flex', gap: 2, mt: 2, mb: 3 }}>
+                <Box sx={{display: 'flex', gap: 2, mt: 2, mb: 3}}>
                     <Autocomplete
                         options={warehouses}
                         getOptionLabel={(option) => option.name}
@@ -130,8 +148,8 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
                         onChange={(_, newValue) => setWarehouseId(newValue?.id || null)}
                         loading={isLoadingWarehouses}
                         disabled={isSubmitting}
-                        sx={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="Склад" />}
+                        sx={{width: 300}}
+                        renderInput={(params) => <TextField {...params} label="Склад"/>}
                     />
                     <TextField
                         label="Комментарий"
@@ -144,7 +162,7 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
 
                 <Typography variant="h6" gutterBottom>Товары</Typography>
 
-                <Paper elevation={2} sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2 }}>
+                <Paper elevation={2} sx={{p: 2, display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2}}>
                     <Autocomplete
                         options={productOptions}
                         getOptionLabel={(option) => `${option.productCode} - ${option.name}`}
@@ -153,27 +171,34 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
                         inputValue={productSearchInput}
                         onInputChange={(_, newInputValue) => setProductSearchInput(newInputValue)}
                         loading={isLoadingProducts}
-                        sx={{ flexGrow: 1 }}
-                        renderInput={(params) => <TextField {...params} label="Поиск товара" />}
+                        sx={{flexGrow: 1}}
+                        renderInput={(params) => <TextField {...params} label="Поиск товара"/>}
                     />
                     <TextField
                         label={quantityLabel}
                         type="number"
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
-                        sx={{ width: 150 }}
+                        sx={{width: 150}}
                     />
                     {movementType === 'INBOUND' && (
-                        <TextField
-                            label="Себестоимость"
-                            type="number"
+                        <NumericFormat
                             value={costPrice}
-                            onChange={(e) => setCostPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                            sx={{ width: 150 }}
+                            thousandSeparator=" "
+                            decimalScale={2}
+                            fixedDecimalScale={false}
+                            allowNegative={false}
+                            customInput={TextField}
+                            label="Себестоимость"
+                            onValueChange={(values) => {
+                                setCostPrice(values.floatValue ?? '');
+                            }}
+                            sx={{width: 150}}
                         />
                     )}
-                    <IconButton color="primary" onClick={handleAddItem} disabled={!selectedProduct || quantity === ''} sx={{ mt: 1 }}>
-                        <AddCircleOutlineIcon />
+                    <IconButton color="primary" onClick={handleAddItem} disabled={!selectedProduct || quantity === ''}
+                                sx={{mt: 1}}>
+                        <AddCircleOutlineIcon/>
                     </IconButton>
                 </Paper>
 
@@ -184,6 +209,7 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
                                 <TableCell>Артикул</TableCell>
                                 <TableCell>Наименование</TableCell>
                                 {movementType === 'INBOUND' && <TableCell align="right">Себестоимость</TableCell>}
+                                {movementType === 'OUTBOUND' && <TableCell align="right">Цена продажи</TableCell>}
                                 <TableCell align="right">{quantityLabel}</TableCell>
                                 <TableCell align="center">Действия</TableCell>
                             </TableRow>
@@ -193,11 +219,14 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
                                 <TableRow key={item.productId}>
                                     <TableCell>{item.productCode}</TableCell>
                                     <TableCell>{item.productName}</TableCell>
-                                    {movementType === 'INBOUND' && <TableCell align="right">{item.costPrice}</TableCell>}
+                                    {movementType === 'INBOUND' &&
+                                        <TableCell align="right">{formatCurrency(item.costPrice)}</TableCell>}
+                                    {movementType === 'OUTBOUND' &&
+                                        <TableCell align="right">{formatCurrency(item.sellingPrice)}</TableCell>}
                                     <TableCell align="right">{item.quantity}</TableCell>
                                     <TableCell align="center">
                                         <IconButton size="small" onClick={() => handleRemoveItem(item.productId)}>
-                                            <DeleteIcon fontSize="small" />
+                                            <DeleteIcon fontSize="small"/>
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
@@ -209,7 +238,7 @@ export const MovementForm = ({ open, onClose, onSubmit, isSubmitting, movementTy
             <DialogActions>
                 <Button onClick={onClose}>Отмена</Button>
                 <Button onClick={handleSubmit} variant="contained" disabled={isSubmitDisabled}>
-                    {isSubmitting ? <CircularProgress size={24} /> : 'Провести операцию'}
+                    {isSubmitting ? <CircularProgress size={24}/> : 'Провести операцию'}
                 </Button>
             </DialogActions>
         </Dialog>

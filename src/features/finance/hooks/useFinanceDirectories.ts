@@ -1,12 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { axiosInstance } from '../../../api/axiosInstance';
-import type {
-    FinanceAccount,
-    FinanceCategory,
-    AccountFormData,
-    CategoryFormData,
-    AccountType
-} from '../types';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {axiosInstance} from '../../../api/axiosInstance';
+import type {AccountFormData, AccountType, CategoryFormData, FinanceAccount, FinanceCategory} from '../types';
 
 const fetchAccounts = async (type?: AccountType): Promise<FinanceAccount[]> => {
     const params = type ? { type } : {};

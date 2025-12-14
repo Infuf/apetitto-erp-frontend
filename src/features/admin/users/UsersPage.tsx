@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Box, Typography, Alert, IconButton, Chip, Switch} from '@mui/material';
+import {Alert, Box, Chip, IconButton, Switch, Typography} from '@mui/material';
 import {DataGrid, type GridColDef, type GridPaginationModel} from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,7 +8,7 @@ import KeyIcon from '@mui/icons-material/Key';
 import {useUsers} from './hooks/useUsers';
 import {UserEditForm} from './UserEditForm';
 import {PasswordResetForm} from './PasswordResetForm';
-import type {User, UserFormData, PasswordResetFormData} from './types';
+import type {PasswordResetFormData, User, UserFormData} from './types';
 
 export const UsersPage = () => {
     const {usePaginatedUsers, update, delete: deleteUser, resetPassword} = useUsers();

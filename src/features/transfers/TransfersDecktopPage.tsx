@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Box, Typography, Alert, Button, IconButton, Chip, Paper, TextField} from '@mui/material';
+import {Alert, Box, Button, Chip, IconButton, Paper, TextField, Typography} from '@mui/material';
 import {DataGrid, type GridColDef, type GridPaginationModel} from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -11,7 +11,7 @@ import {useTransfers} from './hooks/useTransfers';
 import {formatAppDate} from '../../lib/formatDate';
 import {TransferDetailsModal} from './TransferDetailsModal';
 import {TransferForm} from './TransferForm';
-import type {TransferOrder, TransferFilters, TransferOrderRequestDto} from './types';
+import type {TransferFilters, TransferOrder, TransferOrderRequestDto} from './types';
 import {toIsoUtc} from "../../helpers/dateToIsoUtc.ts";
 
 const statusInfo: Record<TransferOrder['status'], {

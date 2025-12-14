@@ -1,14 +1,25 @@
 import {useEffect, useMemo} from 'react';
-import {useForm, Controller} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {
-    Dialog, DialogTitle, DialogContent, DialogActions, Button,
-    TextField, MenuItem, CircularProgress, Grid, Autocomplete, Box, Typography
+    Autocomplete,
+    Box,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    MenuItem,
+    TextField,
+    Typography
 } from '@mui/material';
 import {useFinanceDirectories} from '../hooks/useFinanceDirectories';
 import {OPERATION_CONFIG} from './transactionConfig';
-import {transactionSchema, type TransactionFormData} from './transactionSchema';
+import {type TransactionFormData, transactionSchema} from './transactionSchema';
 import type {TransactionCreateRequestDto, TransactionType} from '../types';
+import {NumericFormatCustom} from '../../../lib/numericFormatCustom.tsx'
 
 interface TransactionFormProps {
     open: boolean;
@@ -81,6 +92,12 @@ export const TransactionForm = ({
         setValue('subCategoryId', null);
     }, [operationType, setValue]);
 
+    const filteredCategories = useMemo(() => {
+        if (!categories) return [];
+
+        return categories.filter(category => category.type === operationType);
+
+    }, [categories, operationType]);
 
     const handleFormSubmit = (data: TransactionFormData) => {
         const payload: TransactionCreateRequestDto = {
@@ -121,15 +138,24 @@ export const TransactionForm = ({
                             )}
                         />
                     </Grid>
-                    <Grid size={{xs: 6}}>
 
-                        <TextField
-                            label="Сумма"
-                            type="number"
-                            fullWidth
-                            {...register('amount')}
-                            error={!!errors.amount}
-                            helperText={errors.amount?.message}
+                    <Grid size={{xs: 6}}>
+                        <Controller
+                            name="amount"
+                            control={control}
+                            render={({field}) => (
+                                <TextField
+                                    {...field}
+                                    label="Сумма"
+                                    fullWidth
+                                    error={!!errors.amount}
+                                    helperText={errors.amount?.message}
+                                    InputProps={{
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        inputComponent: NumericFormatCustom as any,
+                                    }}
+                                />
+                            )}
                         />
                     </Grid>
 
@@ -171,7 +197,6 @@ export const TransactionForm = ({
                         </Grid>
                     )}
 
-                    {/* Dynamic Destination Account */}
                     {config.requiresTo && (
                         <Grid size={{xs: 12}}>
 
@@ -210,7 +235,6 @@ export const TransactionForm = ({
                         </Grid>
                     )}
 
-                    {/* Categories & Subcategories */}
                     {config.requiresCategory && (
                         <>
 
@@ -221,12 +245,12 @@ export const TransactionForm = ({
                                     control={control}
                                     render={({field: {onChange, value, ref}}) => (
                                         <Autocomplete
-                                            options={categories}
+                                            options={filteredCategories}
                                             getOptionLabel={(opt) => opt.name}
                                             value={categories.find(c => c.id === value) || null}
                                             onChange={(_, val) => {
                                                 onChange(val?.id || null);
-                                                setValue('subCategoryId', null); // Reset subcategory
+                                                setValue('subCategoryId', null);
                                             }}
                                             loading={isLoadingCategories}
                                             renderInput={(params) => (

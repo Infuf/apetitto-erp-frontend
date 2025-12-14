@@ -1,22 +1,23 @@
-import { useEffect } from 'react';
-import { useForm, Controller, type Resolver } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import {useEffect} from 'react';
+import {Controller, type Resolver, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {z} from 'zod';
 import {
+    Autocomplete,
+    Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    TextField,
-    CircularProgress,
     MenuItem,
-    Autocomplete,
-    Box,
+    TextField,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../api/axiosInstance';
-import type { Product, CategoryOption } from './types';
+import {useQuery} from '@tanstack/react-query';
+import {axiosInstance} from '../../api/axiosInstance';
+import type {CategoryOption, Product} from './types';
+import {NumericFormatCustom} from '../../lib/numericFormatCustom.tsx'
 
 const unitOptions = ['PIECE', 'KILOGRAM', 'LITER', 'METER'] as const;
 
@@ -24,13 +25,13 @@ const productSchema = z.object({
     name: z.string().min(1, 'Название обязательно'),
     productCode: z.string().min(1, 'Артикул обязателен'),
     unit: z.enum(unitOptions),
-    categoryId: z.number().nullable().refine(v => v != null, { message: 'Категория обязательна' }),
+    categoryId: z.number().nullable().refine(v => v != null, {message: 'Категория обязательна'}),
     description: z.string().optional(),
     barcode: z.string().optional(),
     sellingPrice: z
         .preprocess(
             val => (val === '' || val == null ? undefined : Number(val)),
-            z.number().nonnegative({ message: 'Цена должна быть >= 0' }).optional()
+            z.number().nonnegative({message: 'Цена должна быть >= 0'}).optional()
         ),
 });
 
@@ -45,7 +46,7 @@ interface ProductFormProps {
 }
 
 const fetchCategories = async (): Promise<CategoryOption[]> => {
-    const { data } = await axiosInstance.get('/categories');
+    const {data} = await axiosInstance.get('/categories');
     return data;
 };
 
@@ -56,14 +57,14 @@ export const ProductForm = ({
                                 isSubmitting,
                                 initialData,
                             }: ProductFormProps) => {
-    const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    const {data: categories = [], isLoading: isLoadingCategories} = useQuery({
         queryKey: ['categories'],
         queryFn: fetchCategories,
     });
 
     const resolver = zodResolver(productSchema) as unknown as Resolver<ProductFormData>;
 
-    const { register, handleSubmit, formState: { errors }, reset, control } =
+    const {register, handleSubmit, formState: {errors}, reset, control} =
         useForm<ProductFormData>({
             resolver,
             defaultValues: {
@@ -99,7 +100,7 @@ export const ProductForm = ({
         <Dialog
             open={open}
             onClose={onClose}
-            PaperProps={{ component: 'form', onSubmit: handleSubmit(onSubmit) }}
+            PaperProps={{component: 'form', onSubmit: handleSubmit(onSubmit)}}
             maxWidth="sm"
             fullWidth
         >
@@ -116,7 +117,7 @@ export const ProductForm = ({
                     disabled={isSubmitting}
                 />
 
-                <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                <Box sx={{display: 'flex', gap: 2, mt: 1}}>
                     <TextField
                         label="Артикул"
                         fullWidth
@@ -143,13 +144,13 @@ export const ProductForm = ({
                     </TextField>
                 </Box>
 
-                <Box sx={{ mt: 2 }}>
+                <Box sx={{mt: 2}}>
                     <Controller
                         name="categoryId"
                         control={control}
-                        render={({ field, fieldState }) => (
+                        render={({field, fieldState}) => (
                             <Autocomplete
-                                sx={{ width: '100%' }}
+                                sx={{width: '100%'}}
                                 options={categories}
                                 getOptionLabel={option => option.name}
                                 value={categories.find(c => c.id === field.value) ?? null}
@@ -167,7 +168,8 @@ export const ProductForm = ({
                                             ...params.InputProps,
                                             endAdornment: (
                                                 <>
-                                                    {isLoadingCategories && <CircularProgress color="inherit" size={20} />}
+                                                    {isLoadingCategories &&
+                                                        <CircularProgress color="inherit" size={20}/>}
                                                     {params.InputProps.endAdornment}
                                                 </>
                                             ),
@@ -179,15 +181,24 @@ export const ProductForm = ({
                     />
                 </Box>
 
-                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                    <TextField
-                        label="Цена продажи"
-                        type="number"
-                        fullWidth
-                        {...register('sellingPrice', { valueAsNumber: true })}
-                        error={!!errors.sellingPrice}
-                        helperText={errors.sellingPrice?.message}
-                        disabled={isSubmitting}
+                <Box sx={{display: 'flex', gap: 2, mt: 2}}>
+                    <Controller
+                        name="sellingPrice"
+                        control={control}
+                        render={({field}) => (
+                            <TextField
+                                {...field}
+                                label="Цена продажи"
+                                fullWidth
+                                error={!!errors.sellingPrice}
+                                helperText={errors.sellingPrice?.message}
+                                InputProps={{
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    inputComponent: NumericFormatCustom as any,
+                                }}
+                                disabled={isSubmitting}
+                            />
+                        )}
                     />
                     <TextField
                         label="Штрих-код"
@@ -212,7 +223,7 @@ export const ProductForm = ({
             <DialogActions>
                 <Button onClick={onClose} disabled={isSubmitting}>Отмена</Button>
                 <Button type="submit" variant="contained" disabled={isSubmitting}>
-                    {isSubmitting ? <CircularProgress size={24} /> : 'Сохранить'}
+                    {isSubmitting ? <CircularProgress size={24}/> : 'Сохранить'}
                 </Button>
             </DialogActions>
         </Dialog>

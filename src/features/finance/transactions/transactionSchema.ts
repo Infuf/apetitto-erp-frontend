@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { OPERATION_CONFIG } from './transactionConfig';
-import type { TransactionType } from '../types';
+import {z} from 'zod';
+import {OPERATION_CONFIG} from './transactionConfig';
+import type {TransactionType} from '../types';
 
 export const transactionSchema = z.object({
     amount: z.coerce.number().positive('Сумма должна быть больше 0'),
