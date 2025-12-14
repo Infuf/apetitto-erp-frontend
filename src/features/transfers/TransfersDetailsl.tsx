@@ -1,12 +1,24 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {
-    Box, Typography, CircularProgress, Alert, Paper, Button, Chip,
-    List, ListItem, ListItemText, Divider, AppBar, Toolbar, IconButton
+    Alert,
+    AppBar,
+    Box,
+    Button,
+    Chip,
+    CircularProgress,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Paper,
+    Toolbar,
+    Typography
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-import { useTransfers } from './hooks/useTransfers';
-import { formatAppDate } from '../../lib/formatDate';
+import {useTransfers} from './hooks/useTransfers';
+import {formatAppDate} from '../../lib/formatDate';
 import {Fragment} from "react";
 
 export const TransferDetailPage = () => {

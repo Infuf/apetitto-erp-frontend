@@ -1,10 +1,10 @@
-import {useQuery, useMutation, useQueryClient, keepPreviousData} from '@tanstack/react-query';
+import {keepPreviousData, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {axiosInstance} from '../../../api/axiosInstance';
 import type {
+    FinanceFilters,
     PageTransactionResponseDto,
     TransactionCreateRequestDto,
-    TransactionResponseDto,
-    FinanceFilters
+    TransactionResponseDto
 } from '../types';
 
 const fetchTransactions = async (

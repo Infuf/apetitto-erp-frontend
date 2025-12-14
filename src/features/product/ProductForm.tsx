@@ -1,22 +1,22 @@
 import {useEffect} from 'react';
-import {useForm, Controller, type Resolver} from 'react-hook-form';
+import {Controller, type Resolver, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import {
+    Autocomplete,
+    Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    TextField,
-    CircularProgress,
     MenuItem,
-    Autocomplete,
-    Box,
+    TextField,
 } from '@mui/material';
 import {useQuery} from '@tanstack/react-query';
 import {axiosInstance} from '../../api/axiosInstance';
-import type {Product, CategoryOption} from './types';
+import type {CategoryOption, Product} from './types';
 import {NumericFormatCustom} from '../../lib/numericFormatCustom.tsx'
 
 const unitOptions = ['PIECE', 'KILOGRAM', 'LITER', 'METER'] as const;

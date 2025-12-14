@@ -1,6 +1,6 @@
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {axiosInstance} from '../../../../api/axiosInstance';
-import type {PageUserDto, User, UserFormData, PasswordResetFormData} from '../types';
+import type {PageUserDto, PasswordResetFormData, User, UserFormData} from '../types';
 
 const fetchUsers = async (page: number, size: number): Promise<PageUserDto> => {
     const {data} = await axiosInstance.get('/users', {params: {page, size}});

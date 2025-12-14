@@ -1,14 +1,14 @@
 import {useState} from 'react';
-import {Box, Button, CircularProgress, Typography, Alert, IconButton} from '@mui/material';
+import {Alert, Box, Button, CircularProgress, IconButton, Typography} from '@mui/material';
 import {DataGrid, type GridColDef} from '@mui/x-data-grid';
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import {axiosInstance} from '../../api/axiosInstance.ts';
+import type {WarehouseFormData} from './WarehouseForm';
 import {WarehouseForm} from './WarehouseForm';
 import type {Warehouse} from './types';
-import type {WarehouseFormData} from './WarehouseForm';
 
 const fetchWarehouses = async (): Promise<Warehouse[]> => {
     const {data} = await axiosInstance.get('/warehouses');

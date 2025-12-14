@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { Box, Typography, CircularProgress, Alert, Card, CardActionArea, CardContent, Chip, Button } from '@mui/material';
-import { useTransfers } from './hooks/useTransfers';
-import { formatAppDate } from '../../lib/formatDate';
-import type { TransferOrder } from './types';
+import {useNavigate} from 'react-router-dom';
+import {Alert, Box, Button, Card, CardActionArea, CardContent, Chip, CircularProgress, Typography} from '@mui/material';
+import {useTransfers} from './hooks/useTransfers';
+import {formatAppDate} from '../../lib/formatDate';
+import type {TransferOrder} from './types';
 
 const statusInfo: Record<TransferOrder['status'], { label: string; color: 'default' | 'info' | 'success' | 'error' }> = {
     PENDING: { label: 'Ожидает отправки', color: 'default' },

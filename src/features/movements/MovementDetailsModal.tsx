@@ -1,6 +1,17 @@
 import {
-    Box, Dialog, DialogContent, DialogTitle, IconButton, Typography,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
+    Box,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type {MovementHistoryItem} from './types';

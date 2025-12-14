@@ -1,17 +1,24 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import {useEffect} from 'react';
+import {Controller, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {z} from 'zod';
 import {
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, TextField, Autocomplete, FormControlLabel,
-    Switch, CircularProgress
+    Autocomplete,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    Switch,
+    TextField
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-import { useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../../../api/axiosInstance';
-import type { User, UserFormData, WarehouseOption, RoleOption } from './types';
+import {useQuery} from '@tanstack/react-query';
+import {axiosInstance} from '../../../api/axiosInstance';
+import type {RoleOption, User, UserFormData, WarehouseOption} from './types';
 
 const userSchema = z.object({
     firstName: z.string().min(1, 'Имя обязательно'),

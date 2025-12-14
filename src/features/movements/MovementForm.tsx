@@ -1,15 +1,30 @@
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {
-    Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography,
-    TextField, Autocomplete, IconButton, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, CircularProgress
+    Autocomplete,
+    Box,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography
 } from '@mui/material';
 import {useQuery} from '@tanstack/react-query';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import {axiosInstance} from '../../api/axiosInstance';
-import type {WarehouseOption, ProductOption, MovementItem, MovementType, StockMovementRequestDto} from './types';
+import type {MovementItem, MovementType, ProductOption, StockMovementRequestDto, WarehouseOption} from './types';
 import {formatCurrency} from "../../lib/formatCurrency.ts";
 import {NumericFormat} from "react-number-format";
 

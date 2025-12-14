@@ -1,8 +1,21 @@
 import {useState} from 'react';
 import {NavLink, Outlet} from 'react-router-dom';
 import {
-    AppBar as MuiAppBar, Box, Button, Toolbar, Typography, Drawer as MuiDrawer, List,
-    ListItemButton, ListItemIcon, ListItemText, Collapse, IconButton, CssBaseline, Divider, Avatar
+    AppBar as MuiAppBar,
+    Avatar,
+    Box,
+    Button,
+    Collapse,
+    CssBaseline,
+    Divider,
+    Drawer as MuiDrawer,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Toolbar,
+    Typography
 } from '@mui/material';
 import {styled} from '@mui/material/styles';
 import {useAuth} from '../context/AuthContext';

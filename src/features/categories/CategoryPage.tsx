@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Box, Button, CircularProgress, Typography, Alert, IconButton } from '@mui/material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {useState} from 'react';
+import {Alert, Box, Button, CircularProgress, IconButton, Typography} from '@mui/material';
+import {DataGrid, type GridColDef} from '@mui/x-data-grid';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { axiosInstance } from '../../api/axiosInstance';
-import { CategoryForm } from './CategoryForm';
-import type { Category } from './types';
-import type { CategoryFormData } from './CategoryForm';
+import {axiosInstance} from '../../api/axiosInstance';
+import type {CategoryFormData} from './CategoryForm';
+import {CategoryForm} from './CategoryForm';
+import type {Category} from './types';
 
 const fetchCategories = async (): Promise<Category[]> => {
     const { data } = await axiosInstance.get('/categories');

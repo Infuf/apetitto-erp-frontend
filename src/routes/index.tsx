@@ -14,7 +14,8 @@ import {TransferDetailPage} from "../features/transfers/TransfersDetailsl";
 import {UsersPage} from "../features/admin/users/UsersPage";
 import {FinanceAccountsPage} from "../features/finance/accounts/FinanceAccountsPage.tsx";
 import {CategoriesPage as FinanceCategoriesPage} from '../features/finance/categories/CategoryPage.tsx';
-import { FinancePage } from '../features/finance/FinancePage.tsx';
+import {FinancePage} from '../features/finance/FinancePage.tsx';
+
 export const AppRoutes = () => {
     return (
         <Routes>

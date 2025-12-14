@@ -1,9 +1,8 @@
-
-import { useTheme } from '@mui/material/styles';
+import {useTheme} from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { TransfersMobilePage } from './TransfersMobilePage';
-import { TransfersDesktopPage } from './TransfersDecktopPage.tsx';
+import {TransfersMobilePage} from './TransfersMobilePage';
+import {TransfersDesktopPage} from './TransfersDecktopPage.tsx';
 
 export const TransfersPage = () => {
     const theme = useTheme();
