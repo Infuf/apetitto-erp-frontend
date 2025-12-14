@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {
     Box, Typography, Button, Tabs, Tab, CircularProgress,
-    Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, Chip, Divider
+    Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, Chip, Divider, IconButton
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -36,7 +36,10 @@ export const CategoriesPage = () => {
         setIsModalOpen(true);
     };
 
-    const handleOpenSubCategoryModal = (e: React.MouseEvent, category: FinanceCategory) => {
+    const handleOpenSubCategoryModal = (
+        e: React.MouseEvent<HTMLElement>,
+        category: FinanceCategory
+    ) => {
         e.stopPropagation();
         setParentCategory(category);
         setIsModalOpen(true);
@@ -84,14 +87,13 @@ export const CategoriesPage = () => {
                                     variant="outlined"
                                     sx={{mr: 2}}
                                 />
-                                <Button
+                                <IconButton
+                                    component="span"
                                     size="small"
-                                    startIcon={<AddIcon/>}
                                     onClick={(e) => handleOpenSubCategoryModal(e, category)}
-                                    variant="outlined"
                                 >
-                                    Подкатегория
-                                </Button>
+                                    <AddIcon fontSize="small"/>
+                                </IconButton>
                             </Box>
                         </AccordionSummary>
                         <AccordionDetails sx={{bgcolor: '#fafafa', p: 0}}>

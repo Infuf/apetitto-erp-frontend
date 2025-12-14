@@ -3,6 +3,7 @@ export type MovementType = 'INBOUND' | 'OUTBOUND' | 'ADJUSTMENT';
 export interface MovementItem {
     productId: number;
     quantity: number;
+    sellingPrice?: number;
     costPrice?: number;
     productName?: string;
     productCode?: string;
@@ -29,6 +30,7 @@ export interface ProductOption {
     id: number;
     name: string;
     productCode: string;
+    sellingPrice?: number;
 }
 
 export interface MovementHistoryItem {
@@ -45,6 +47,7 @@ export interface MovementsPageResponse {
     content: MovementHistoryItem[];
     totalElements: number;
 }
+
 export interface MovementHistoryItem {
     id: number;
     warehouseId: number;
@@ -52,12 +55,14 @@ export interface MovementHistoryItem {
     movementType: 'INBOUND' | 'OUTBOUND' | 'TRANSFER_OUT' | 'TRANSFER_IN' | 'ADJUSTMENT' | 'SELL';
     movementTime: string;
     comment?: string;
-    items: { productId: number; quantity: number; costPrice?: number }[];
+    items: { productId: number; quantity: number; costPrice?: number; productName: string }[];
 }
+
 export interface MovementsPageResponse {
     content: MovementHistoryItem[];
     totalElements: number;
 }
+
 export interface MovementDetailItem {
     productId: number;
     quantity: number;

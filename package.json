@@ -27,6 +27,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.65.0",
+    "react-number-format": "^5.4.4",
+    "react-number-formatter": "^1.0.29",
     "react-router-dom": "^7.9.4",
     "zod": "^4.1.12"
   },

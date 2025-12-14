@@ -135,7 +135,7 @@ const financeItems = [
         text: 'Статьи (Категории)',
         path: '/finance/categories',
         icon: <ClassIcon/>,
-        roles: ['ROLE_ADMIN', 'ROLE_OWNER']
+        roles: ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER']
     },
 ];
 

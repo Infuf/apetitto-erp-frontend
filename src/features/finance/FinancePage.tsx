@@ -149,6 +149,7 @@ export const FinancePage = () => {
             }
         },
         {field: 'description', headerName: 'Комментарий', flex: 1},
+        {field: 'createdByName', headerName: 'Создан', flex: 1},
         {
             field: 'actions',
             headerName: 'Детали',

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {
     Box,
     Button,
@@ -23,10 +23,11 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import {formatCurrency} from "../../lib/formatCurrency.ts";
 
-import { axiosInstance } from '../../api/axiosInstance';
-import { ProductForm } from './ProductForm';
-import type { Product, ProductFormData, ProductPageResponse } from './types';
+import {axiosInstance} from '../../api/axiosInstance';
+import {ProductForm} from './ProductForm';
+import type {Product, ProductFormData, ProductPageResponse} from './types';
 
 
 function useDebounce<T>(value: T, delay = 400): T {
@@ -47,19 +48,19 @@ const fetchProducts = async (
     search: string
 ): Promise<ProductPageResponse> => {
     const endpoint = search ? '/products/search' : '/products';
-    const { data } = await axiosInstance.get(endpoint, {
-        params: { page, size, name: search },
+    const {data} = await axiosInstance.get(endpoint, {
+        params: {page, size, name: search},
     });
     return data;
 };
 
 const createProduct = async (productData: ProductFormData): Promise<Product> => {
-    const { data } = await axiosInstance.post('/products', productData);
+    const {data} = await axiosInstance.post('/products', productData);
     return data;
 };
 
 const updateProduct = async (productData: Product): Promise<Product> => {
-    const { data } = await axiosInstance.put(`/products`, productData);
+    const {data} = await axiosInstance.put(`/products`, productData);
     return data;
 };
 
@@ -96,26 +97,26 @@ export const ProductsPage = () => {
         staleTime: 15_000, // 15 секунд кэш
     });
 
-    const { mutate: addProduct, isPending: isCreating } = useMutation({
+    const {mutate: addProduct, isPending: isCreating} = useMutation({
         mutationFn: createProduct,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({queryKey: ['products']});
             closeModal();
         },
     });
 
-    const { mutate: editProduct, isPending: isEditing } = useMutation({
+    const {mutate: editProduct, isPending: isEditing} = useMutation({
         mutationFn: updateProduct,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({queryKey: ['products']});
             closeModal();
         },
     });
 
-    const { mutate: removeProduct } = useMutation({
+    const {mutate: removeProduct} = useMutation({
         mutationFn: deleteProduct,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({queryKey: ['products']});
         },
     });
 
@@ -161,34 +162,42 @@ export const ProductsPage = () => {
 
 
     const columns: GridColDef<Product>[] = [
-        { field: 'productCode', headerName: 'Артикул', width: 130 },
-        { field: 'name', headerName: 'Название', flex: 1, minWidth: 150 },
-        { field: 'categoryName', headerName: 'Категория', flex: 1, minWidth: 150 },
-        { field: 'sellingPrice', headerName: 'Цена', width: 120 },
-        { field: 'unit', headerName: 'Ед. изм.', width: 100 },
-        {
-            field: 'actions',
-            headerName: 'Действия',
-            sortable: false,
-            width: 120,
-            renderCell: (params) => (
-                <>
-                    <IconButton onClick={() => handleEditClick(params.row)}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteClick(params.row.id)}>
-                        <DeleteIcon />
-                    </IconButton>
-                </>
-            ),
-        },
-    ];
+            {field: 'productCode', headerName: 'Артикул', width: 130},
+            {field: 'name', headerName: 'Название', flex: 1, minWidth: 150},
+            {field: 'categoryName', headerName: 'Категория', flex: 1, minWidth: 150},
+            {
+                field: 'sellingPrice', headerName: 'Цена', width: 120,
+                renderCell: (params) => {
+                    return formatCurrency(params.value);
+                }
+            },
+            {field: 'unit', headerName: 'Ед. изм.', width: 100},
+            {
+                field: 'actions', headerName: 'Действия', sortable:
+                    false,
+                width:
+                    120,
+                renderCell:
+                    (params) => (
+                        <>
+                            <IconButton onClick={() => handleEditClick(params.row)}>
+                                <EditIcon/>
+                            </IconButton>
+                            <IconButton onClick={() => handleDeleteClick(params.row.id)}>
+                                <DeleteIcon/>
+                            </IconButton>
+                        </>
+                    ),
+            }
+            ,
+        ]
+    ;
 
 
     if (isLoading && !data) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
+            <Box sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
+                <CircularProgress/>
             </Box>
         );
     }
@@ -220,7 +229,7 @@ export const ProductsPage = () => {
                 </Button>
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <Box sx={{display: 'flex', gap: 2, mb: 2}}>
                 <TextField
                     label="Поиск по названию"
                     variant="outlined"
@@ -231,19 +240,19 @@ export const ProductsPage = () => {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchIcon color="action" />
+                                <SearchIcon color="action"/>
                             </InputAdornment>
                         ),
                         endAdornment: isFetching ? (
                             <InputAdornment position="end">
-                                <CircularProgress size={20} />
+                                <CircularProgress size={20}/>
                             </InputAdornment>
                         ) : null,
                     }}
                 />
             </Box>
 
-            <Box sx={{ height: 600, width: '100%' }}>
+            <Box sx={{height: 600, width: '100%'}}>
                 <DataGrid
                     rows={data?.content ?? []}
                     columns={columns}

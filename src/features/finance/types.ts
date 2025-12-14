@@ -62,7 +62,6 @@ export interface TransactionCreateRequestDto {
     toAccountId?: number;
     categoryId?: number;
     subcategoryId?: number;
-    // items?: any[]; // Если нужно передавать товары при создании
 }
 
 export interface TransactionResponseDto {
