@@ -42,6 +42,7 @@ export interface AccountFormData {
     name: string;
     type: AccountType;
     description?: string;
+    discountPercentage?: number;
 }
 
 export interface CategoryFormData {

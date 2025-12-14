@@ -18,6 +18,7 @@ export interface StockMovementRequestDto {
         quantity: number;
         costPrice?: number;
     }[];
+    financeAccountId?: number | null;
 }
 
 

@@ -90,6 +90,15 @@ export const FinanceAccountsPage = () => {
                 return <span style={{color, fontWeight: 'bold'}}>{formatCurrency(val)}</span>;
             }
         },
+        {
+            field: 'discountPercentage',
+            headerName: 'Скидка',
+            flex: 1.5,
+            valueFormatter: (value) => {
+                if (value == null || value === 0) return '';
+                return `${value}%`;
+            },
+        },
         {field: 'description', headerName: 'Описание', flex: 1.5},
         {
             field: 'actions',

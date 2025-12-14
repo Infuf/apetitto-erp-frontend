@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {
     Autocomplete,
     Box,
@@ -22,11 +22,12 @@ import {
 import {useQuery} from '@tanstack/react-query';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import {NumericFormat} from "react-number-format";
 
 import {axiosInstance} from '../../api/axiosInstance';
+import {formatCurrency} from "../../lib/formatCurrency";
+import {type FinanceAccount} from '../finance/types.ts'
 import type {MovementItem, MovementType, ProductOption, StockMovementRequestDto, WarehouseOption} from './types';
-import {formatCurrency} from "../../lib/formatCurrency.ts";
-import {NumericFormat} from "react-number-format";
 
 interface MovementFormProps {
     open: boolean;
@@ -36,8 +37,14 @@ interface MovementFormProps {
     movementType: MovementType;
 }
 
+
 const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
     const {data} = await axiosInstance.get('/warehouses');
+    return data;
+};
+
+const fetchAccounts = async (): Promise<FinanceAccount[]> => {
+    const {data} = await axiosInstance.get('/finance/accounts');
     return data;
 };
 
@@ -47,6 +54,7 @@ const searchProducts = async (name: string): Promise<ProductOption[]> => {
     return data.content || [];
 };
 
+
 const formTitles: Record<MovementType, string> = {
     INBOUND: 'Новый приход',
     OUTBOUND: 'Новый расход / списание',
@@ -55,6 +63,7 @@ const formTitles: Record<MovementType, string> = {
 
 export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementType}: MovementFormProps) => {
     const [warehouseId, setWarehouseId] = useState<number | null>(null);
+    const [accountId, setAccountId] = useState<number | null>(null);
     const [comment, setComment] = useState('');
     const [items, setItems] = useState<MovementItem[]>([]);
 
@@ -63,9 +72,16 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
     const [quantity, setQuantity] = useState<number | ''>(1);
     const [costPrice, setCostPrice] = useState<number | ''>('');
 
+
     const {data: warehouses = [], isLoading: isLoadingWarehouses} = useQuery({
         queryKey: ['warehouses'],
         queryFn: fetchWarehouses,
+    });
+
+    const {data: accounts = [], isLoading: isLoadingAccounts} = useQuery({
+        queryKey: ['financeAccounts'],
+        queryFn: fetchAccounts,
+        enabled: open && movementType !== 'ADJUSTMENT',
     });
 
     const {data: productOptions = [], isLoading: isLoadingProducts} = useQuery({
@@ -74,9 +90,11 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
         enabled: !!productSearchInput,
     });
 
+
     useEffect(() => {
         if (!open) {
             setWarehouseId(null);
+            setAccountId(null);
             setComment('');
             setItems([]);
             setSelectedProduct(null);
@@ -84,6 +102,26 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
             setCostPrice('');
         }
     }, [open]);
+
+    useEffect(() => {
+        setAccountId(null);
+    }, [movementType]);
+
+    const filteredAccounts = useMemo(() => {
+        if (movementType === 'INBOUND') {
+            return accounts.filter(acc => acc.type === 'SUPPLIER');
+        }
+        if (movementType === 'OUTBOUND') {
+            return accounts.filter(acc => acc.type === 'DEALER');
+        }
+        return [];
+    }, [accounts, movementType]);
+
+    const accountLabel = useMemo(() => {
+        if (movementType === 'INBOUND') return 'Поставщик';
+        if (movementType === 'OUTBOUND') return 'Дилер (Получатель)';
+        return 'Контрагент';
+    }, [movementType]);
 
     const handleAddItem = () => {
         if (!selectedProduct || quantity === '') return;
@@ -111,7 +149,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                 productId: selectedProduct.id,
                 quantity: quantity,
                 costPrice: movementType === 'INBOUND' ? costPrice as number : undefined,
-                sellingPrice: movementType === 'OUTBOUND' ? selectedProduct.sellingPrice as number : undefined,
+                sellingPrice: movementType === 'OUTBOUND' ? selectedProduct.sellingPrice : undefined,
                 productName: selectedProduct.name,
                 productCode: selectedProduct.productCode,
             }];
@@ -130,16 +168,25 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
     const handleSubmit = () => {
         if (!warehouseId) return;
         const itemsToSubmit = items.map(({productId, quantity, costPrice}) => ({productId, quantity, costPrice}));
-        onSubmit({warehouseId, movementType, comment, items: itemsToSubmit});
+
+        onSubmit({
+            warehouseId,
+            movementType,
+            comment,
+            items: itemsToSubmit,
+            financeAccountId: accountId ?? undefined
+        });
     };
 
     const isSubmitDisabled = !warehouseId || items.length === 0 || isSubmitting;
     const quantityLabel = movementType === 'ADJUSTMENT' ? 'Изменение (+/-)' : 'Кол-во';
+    const showAccountSelect = movementType === 'INBOUND' || movementType === 'OUTBOUND';
 
     return (
         <Dialog open={open} maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting}>
             <DialogTitle>{formTitles[movementType]}</DialogTitle>
             <DialogContent>
+                {/* Header section: Warehouse, Account, Comment */}
                 <Box sx={{display: 'flex', gap: 2, mt: 2, mb: 3}}>
                     <Autocomplete
                         options={warehouses}
@@ -149,8 +196,23 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                         loading={isLoadingWarehouses}
                         disabled={isSubmitting}
                         sx={{width: 300}}
-                        renderInput={(params) => <TextField {...params} label="Склад"/>}
+                        renderInput={(params) => <TextField {...params} label="Склад" required/>}
                     />
+
+                    {showAccountSelect && (
+                        <Autocomplete
+                            options={filteredAccounts}
+                            getOptionLabel={(option) => option.name}
+                            value={filteredAccounts.find(a => a.id === accountId) || null}
+                            onChange={(_, newValue) => setAccountId(newValue?.id || null)}
+                            loading={isLoadingAccounts}
+                            disabled={isSubmitting}
+                            sx={{width: 300}}
+                            renderInput={(params) => <TextField {...params} label={accountLabel}/>}
+                            noOptionsText="Нет подходящих счетов"
+                        />
+                    )}
+
                     <TextField
                         label="Комментарий"
                         value={comment}
@@ -162,6 +224,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
 
                 <Typography variant="h6" gutterBottom>Товары</Typography>
 
+                {/* Add Item Section */}
                 <Paper elevation={2} sx={{p: 2, display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2}}>
                     <Autocomplete
                         options={productOptions}
@@ -196,8 +259,12 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                             sx={{width: 150}}
                         />
                     )}
-                    <IconButton color="primary" onClick={handleAddItem} disabled={!selectedProduct || quantity === ''}
-                                sx={{mt: 1}}>
+                    <IconButton
+                        color="primary"
+                        onClick={handleAddItem}
+                        disabled={!selectedProduct || quantity === ''}
+                        sx={{mt: 1}}
+                    >
                         <AddCircleOutlineIcon/>
                     </IconButton>
                 </Paper>
