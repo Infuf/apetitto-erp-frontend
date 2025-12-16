@@ -29,6 +29,16 @@ const createTransaction = async (data: TransactionCreateRequestDto): Promise<Tra
     const {data: result} = await axiosInstance.post('/finance/transactions', data);
     return result;
 };
+const fetchTransactionDetails = async (id: number): Promise<TransactionResponseDto> => {
+    const {data} = await axiosInstance.get(`/finance/transactions/${id}`);
+    return data;
+};
+
+const useTransactionDetails = (id: number | null) => useQuery({
+    queryKey: ['financeTransaction', id],
+    queryFn: () => fetchTransactionDetails(id!),
+    enabled: !!id,
+});
 
 export const useFinanceTransactions = () => {
     const queryClient = useQueryClient();
@@ -52,5 +62,6 @@ export const useFinanceTransactions = () => {
     return {
         usePaginatedTransactions,
         createTransaction: createMutation,
+        useTransactionDetails
     };
 };

@@ -64,6 +64,14 @@ export interface TransactionCreateRequestDto {
     categoryId?: number;
     subcategoryId?: number;
 }
+export interface TransactionItemViewDto {
+    productId: number;
+    productName: string;
+    productCode: string;
+    quantity: number;
+    priceSnapshot: number;
+    totalAmount: number;
+}
 
 export interface TransactionResponseDto {
     id: number;
@@ -87,6 +95,7 @@ export interface TransactionResponseDto {
 
     createdBy?: number;
     createdByName?: string;
+    items?: TransactionItemViewDto[];
 }
 
 export interface PageTransactionResponseDto {

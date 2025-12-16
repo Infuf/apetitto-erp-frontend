@@ -32,6 +32,7 @@ import type {
     TransactionResponseDto,
     TransactionType
 } from './types';
+import {TransactionDetailsModal} from "./transactions/TransactionDetailesModal.tsx";
 
 const typeLabels: Record<string, { label: string, color: 'success' | 'error' | 'default' | 'primary' | 'warning' }> = {
     INCOME: {label: 'Доход', color: 'success'},
@@ -56,6 +57,7 @@ const accountTypesFilter = [
 export const FinancePage = () => {
     const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({page: 0, pageSize: 25});
     const [modalType, setModalType] = useState<TransactionType | null>(null);
+    const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
 
     const [selectedAccountType, setSelectedAccountType] = useState<string[]>(['CASHBOX', 'BANK']);
     const [selectedAccount, setSelectedAccount] = useState<FinanceAccount | null>(null);
@@ -167,7 +169,7 @@ export const FinancePage = () => {
             sortable: false,
             width: 70,
             renderCell: (params) => (
-                <IconButton size="small" onClick={() => alert(`Детали транзакции ${params.id} (Скоро)`)}>
+                <IconButton size="small" onClick={() => setSelectedTransactionId(params.row.id)}>
                     <VisibilityIcon/>
                 </IconButton>
             )
@@ -316,6 +318,10 @@ export const FinancePage = () => {
                     initialType={modalType}
                 />
             )}
+            <TransactionDetailsModal
+                transactionId={selectedTransactionId}
+                onClose={() => setSelectedTransactionId(null)}
+            />
         </Box>
     );
 };
