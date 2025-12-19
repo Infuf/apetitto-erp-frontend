@@ -21,6 +21,7 @@ import {
 import {useFinanceTransactions} from '../hooks/useFinanceTransaction';
 import {formatAppDate} from '../../../lib/formatDate';
 import {formatCurrency} from '../../../lib/formatCurrency';
+import TelegramIcon from '@mui/icons-material/Telegram';
 
 interface TransactionDetailsModalProps {
     transactionId: number | null;
@@ -42,6 +43,57 @@ const typeLabels: Record<string, string> = {
 export const TransactionDetailsModal = ({transactionId, onClose}: TransactionDetailsModalProps) => {
     const {useTransactionDetails} = useFinanceTransactions();
     const {data: transaction, isLoading, isError} = useTransactionDetails(transactionId);
+
+    const handleShareToTelegram = () => {
+        if (!transaction) return;
+
+        const typeLabel = typeLabels[transaction.operationType] || transaction.operationType;
+        const dateStr = formatAppDate(transaction.transactionDate);
+        const amountStr = formatCurrency(transaction.amount);
+
+        let message = `🧾 Чек транзакции #${transaction.id}\n`;
+        message += `📅 Дата: ${dateStr}\n`;
+        message += `📂 Тип: ${typeLabel}\n`;
+        message += `💰 Общая сумма: ${amountStr}\n`;
+        message += `-----------------------------\n`;
+
+        if (transaction.fromAccountName) message += `📤 Списано с: ${transaction.fromAccountName}\n`;
+        if (transaction.toAccountName) message += `📥 Зачислено на: ${transaction.toAccountName}\n`;
+
+        if (transaction.categoryName) {
+            message += `🏷 Категория: ${transaction.categoryName}`;
+            if (transaction.subcategoryName) message += ` / ${transaction.subcategoryName}`;
+            message += `\n`;
+        }
+
+        if (transaction.description) message += `💬 Комментарий: ${transaction.description}\n`;
+
+
+        if (transaction.items && transaction.items.length > 0) {
+            message += `-----------------------------\n`;
+            message += `📦 Состав операции:\n`;
+
+            message += '```\n';
+
+            transaction.items.forEach((item) => {
+                const itemName = item.productName.length > 10
+                    ? item.productName.slice(0, 10) + '…'
+                    : item.productName;
+
+                const pricePerUnit = formatCurrency(item.priceSnapshot); // цена за 1 шт
+                const quantity = item.quantity;
+                const total = formatCurrency(item.totalAmount);
+
+                const line = `${itemName.padEnd(15)} | ${pricePerUnit.padStart(10)} | ${String(quantity).padStart(3)} шт | ${total.padStart(10)}\n`;
+                message += line;
+            });
+
+            message += '```\n';
+        }
+
+        const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent('Apititto ERP')}&text=${encodeURIComponent(message)}`;
+        window.open(telegramUrl, '_blank', 'noopener,noreferrer');
+    };
 
     if (!transactionId) return null;
 
@@ -177,6 +229,19 @@ export const TransactionDetailsModal = ({transactionId, onClose}: TransactionDet
                 )}
             </DialogContent>
             <DialogActions>
+                <Button
+                    startIcon={<TelegramIcon/>}
+                    variant="outlined"
+                    onClick={handleShareToTelegram}
+                    disabled={!transaction}
+                    sx={{
+                        borderColor: '#0088cc',
+                        color: '#0088cc',
+                        '&:hover': {borderColor: '#0077b5', bgcolor: '#e1f5fe'}
+                    }}
+                >
+                    Поделиться
+                </Button>
                 <Button onClick={onClose} variant="contained">Закрыть</Button>
             </DialogActions>
         </Dialog>

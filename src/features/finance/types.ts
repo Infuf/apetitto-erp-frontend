@@ -109,3 +109,7 @@ export interface FinanceFilters {
     dateFrom: string | null;
     dateTo: string | null;
 }
+
+export interface CancellationRequestDto {
+    reason: string;
+}

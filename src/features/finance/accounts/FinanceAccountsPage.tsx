@@ -24,6 +24,7 @@ import {useFinanceDirectories} from '../hooks/useFinanceDirectories';
 import {AccountForm} from './AccountForm';
 import {formatCurrency} from '../../../lib/formatCurrency';
 import type {AccountFormData, FinanceAccount} from '../types';
+import {AccountDeleteDialog} from './AccountDeleteDialog';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -50,7 +51,7 @@ export const FinanceAccountsPage = () => {
     const [tabValue, setTabValue] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const {useAccounts, createAccount, deleteAccount} = useFinanceDirectories();
-
+    const [accountToDelete, setAccountToDelete] = useState<{ id: number; name: string } | null>(null);
     const {data: accounts = [], isLoading, isError, error} = useAccounts();
 
     const handleCreate = (data: AccountFormData) => {
@@ -58,11 +59,13 @@ export const FinanceAccountsPage = () => {
             onSuccess: () => setIsModalOpen(false),
         });
     };
-
-    const handleDelete = (id: number, name: string) => {
-        if (window.confirm(`Вы уверены, что хотите удалить счет "${name}"?`)) {
-            deleteAccount.mutate(id);
-        }
+    const onClickDelete = (id: number, name: string) => {
+        setAccountToDelete({id, name});
+    };
+    const handleConfirmDelete = (id: number) => {
+        deleteAccount.mutate(id, {
+            onSuccess: () => setAccountToDelete(null), // Закрываем диалог при успехе
+        });
     };
 
     const internalAccounts = accounts.filter(a => ['CASHBOX', 'BANK', 'OWNER'].includes(a.type));
@@ -105,7 +108,7 @@ export const FinanceAccountsPage = () => {
             headerName: '',
             width: 60,
             renderCell: (params) => (
-                <IconButton size="small" onClick={() => handleDelete(params.row.id, params.row.name)} color="error">
+                <IconButton size="small" onClick={() => onClickDelete(params.row.id, params.row.name)} color="error">
                     <DeleteIcon/>
                 </IconButton>
             )
@@ -148,7 +151,8 @@ export const FinanceAccountsPage = () => {
                                             <Typography variant="subtitle2"
                                                         color="text.secondary">{account.type}</Typography>
                                         </Box>
-                                        <IconButton size="small" onClick={() => handleDelete(account.id, account.name)}>
+                                        <IconButton size="small"
+                                                    onClick={() => onClickDelete(account.id, account.name)}>
                                             <DeleteIcon fontSize="small"/>
                                         </IconButton>
                                     </Box>
@@ -196,6 +200,12 @@ export const FinanceAccountsPage = () => {
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleCreate}
                 isSubmitting={createAccount.isPending}
+            />
+            <AccountDeleteDialog
+                account={accountToDelete}
+                onClose={() => setAccountToDelete(null)}
+                onConfirm={handleConfirmDelete}
+                isDeleting={deleteAccount.isPending}
             />
         </Box>
     );

@@ -19,7 +19,8 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
+import CancelIcon from '@mui/icons-material/Cancel';
+import {TransactionCancellationDialog} from './transactions/TransactionCancellationDialog';
 import {useFinanceTransactions} from './hooks/useFinanceTransaction.ts';
 import {useFinanceDirectories} from './hooks/useFinanceDirectories';
 import {TransactionForm} from './transactions/TransactionsForm.tsx';
@@ -68,6 +69,8 @@ export const FinancePage = () => {
     });
 
     const [activeFilters, setActiveFilters] = useState<FinanceFilters>({accountId: null, dateFrom: null, dateTo: null});
+
+    const [transactionToCancel, setTransactionToCancel] = useState<number | null>(null);
 
     const {useAccounts} = useFinanceDirectories();
     const {data: allAccounts = []} = useAccounts();
@@ -165,13 +168,30 @@ export const FinancePage = () => {
         {field: 'createdByName', headerName: 'Создан', flex: 1},
         {
             field: 'actions',
-            headerName: 'Детали',
+            headerName: '',
             sortable: false,
-            width: 70,
+            width: 100,
             renderCell: (params) => (
-                <IconButton size="small" onClick={() => setSelectedTransactionId(params.row.id)}>
-                    <VisibilityIcon/>
-                </IconButton>
+                <Box>
+                    <IconButton
+                        size="small"
+                        onClick={() => setSelectedTransactionId(params.row.id)}
+                        title="Детали"
+                    >
+                        <VisibilityIcon/>
+                    </IconButton>
+
+                    {params.row.status !== 'CANCELLED' && (
+                        <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => setTransactionToCancel(params.row.id)}
+                            title="Отменить транзакцию (Сторно)"
+                        >
+                            <CancelIcon/>
+                        </IconButton>
+                    )}
+                </Box>
             )
         }
     ];
@@ -321,6 +341,10 @@ export const FinancePage = () => {
             <TransactionDetailsModal
                 transactionId={selectedTransactionId}
                 onClose={() => setSelectedTransactionId(null)}
+            />
+            <TransactionCancellationDialog
+                transactionId={transactionToCancel}
+                onClose={() => setTransactionToCancel(null)}
             />
         </Box>
     );
