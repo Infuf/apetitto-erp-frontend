@@ -1,6 +1,7 @@
 import {keepPreviousData, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {axiosInstance} from '../../../api/axiosInstance';
 import type {
+    CancellationRequestDto,
     FinanceFilters,
     PageTransactionResponseDto,
     TransactionCreateRequestDto,
@@ -29,6 +30,10 @@ const createTransaction = async (data: TransactionCreateRequestDto): Promise<Tra
     const {data: result} = await axiosInstance.post('/finance/transactions', data);
     return result;
 };
+
+const cancelTransaction = async ({id, data}: { id: number; data: CancellationRequestDto }): Promise<void> => {
+    await axiosInstance.post(`/finance/transactions/${id}/cancel`, data);
+};
 const fetchTransactionDetails = async (id: number): Promise<TransactionResponseDto> => {
     const {data} = await axiosInstance.get(`/finance/transactions/${id}`);
     return data;
@@ -43,6 +48,14 @@ const useTransactionDetails = (id: number | null) => useQuery({
 export const useFinanceTransactions = () => {
     const queryClient = useQueryClient();
 
+    const cancelMutation = useMutation({
+        mutationFn: cancelTransaction,
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['financeTransactions']});
+            queryClient.invalidateQueries({queryKey: ['financeAccounts']});
+            queryClient.invalidateQueries({queryKey: ['financeTransaction']});
+        },
+    });
     const usePaginatedTransactions = (page: number, pageSize: number, filters: FinanceFilters) =>
         useQuery({
             queryKey: ['financeTransactions', page, pageSize, filters],
@@ -62,6 +75,7 @@ export const useFinanceTransactions = () => {
     return {
         usePaginatedTransactions,
         createTransaction: createMutation,
+        cancelTransaction: cancelMutation,
         useTransactionDetails
     };
 };
