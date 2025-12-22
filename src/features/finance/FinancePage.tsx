@@ -20,10 +20,12 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CancelIcon from '@mui/icons-material/Cancel';
+
 import {TransactionCancellationDialog} from './transactions/TransactionCancellationDialog';
-import {useFinanceTransactions} from './hooks/useFinanceTransaction.ts';
+import {useFinanceTransactions} from './hooks/useFinanceTransaction';
 import {useFinanceDirectories} from './hooks/useFinanceDirectories';
 import {TransactionForm} from './transactions/TransactionsForm.tsx';
+import {TransactionDetailsModal} from './transactions/TransactionDetailesModal.tsx';
 import {formatAppDate} from '../../lib/formatDate';
 import {formatCurrency} from '../../lib/formatCurrency';
 import type {
@@ -33,7 +35,6 @@ import type {
     TransactionResponseDto,
     TransactionType
 } from './types';
-import {TransactionDetailsModal} from "./transactions/TransactionDetailesModal.tsx";
 
 const typeLabels: Record<string, { label: string, color: 'success' | 'error' | 'default' | 'primary' | 'warning' }> = {
     INCOME: {label: 'Доход', color: 'success'},
@@ -59,9 +60,10 @@ export const FinancePage = () => {
     const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({page: 0, pageSize: 25});
     const [modalType, setModalType] = useState<TransactionType | null>(null);
     const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
+    const [transactionToCancel, setTransactionToCancel] = useState<number | null>(null);
 
     const [selectedAccountType, setSelectedAccountType] = useState<string[]>(['CASHBOX', 'BANK']);
-    const [selectedAccount, setSelectedAccount] = useState<FinanceAccount | null>(null);
+    const [selectedAccountId, setSelectedAccountId] = useState<number | null>(null);
 
     const [dateFilters, setDateFilters] = useState<{ dateFrom: string | null, dateTo: string | null }>({
         dateFrom: null,
@@ -69,8 +71,6 @@ export const FinancePage = () => {
     });
 
     const [activeFilters, setActiveFilters] = useState<FinanceFilters>({accountId: null, dateFrom: null, dateTo: null});
-
-    const [transactionToCancel, setTransactionToCancel] = useState<number | null>(null);
 
     const {useAccounts} = useFinanceDirectories();
     const {data: allAccounts = []} = useAccounts();
@@ -87,10 +87,14 @@ export const FinancePage = () => {
         return allAccounts.filter(acc => selectedAccountType.includes(acc.type));
     }, [allAccounts, selectedAccountType]);
 
-    const handleAccountChange = (account: FinanceAccount | null) => {
-        setSelectedAccount(account);
-        setPaginationModel(prev => ({...prev, page: 0}));
+    const selectedAccount = useMemo(() =>
+            allAccounts.find(a => a.id === selectedAccountId) || null,
+        [allAccounts, selectedAccountId]);
 
+    const handleAccountChange = (account: FinanceAccount | null) => {
+        setSelectedAccountId(account?.id || null);
+
+        setPaginationModel(prev => ({...prev, page: 0}));
         setActiveFilters(prev => ({...prev, accountId: account?.id || null}));
     };
 
@@ -145,7 +149,7 @@ export const FinancePage = () => {
             headerName: 'Сумма',
             width: 140,
             renderCell: (params) => {
-                const isOutgoing = params.row.fromAccountId === selectedAccount?.id;
+                const isOutgoing = params.row.fromAccountId === selectedAccountId;
                 const color = isOutgoing ? '#d32f2f' : '#2e7d32';
                 const prefix = isOutgoing ? '-' : '+';
                 return <span style={{color, fontWeight: 'bold'}}>{prefix} {formatCurrency(params.value)}</span>;
@@ -157,7 +161,7 @@ export const FinancePage = () => {
             flex: 1.5,
             renderCell: (params) => {
                 const row = params.row;
-                if (row.fromAccountId === selectedAccount?.id) {
+                if (row.fromAccountId === selectedAccountId) {
                     return `➝ ${row.toAccountName || row.categoryName || 'Неизвестно'}`;
                 } else {
                     return `← ${row.fromAccountName || 'Внешний источник'}`;
@@ -168,7 +172,7 @@ export const FinancePage = () => {
         {field: 'createdByName', headerName: 'Создан', flex: 1},
         {
             field: 'actions',
-            headerName: '',
+            headerName: 'Действия',
             sortable: false,
             width: 100,
             renderCell: (params) => (
@@ -199,7 +203,7 @@ export const FinancePage = () => {
     return (
         <Box>
             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-                <Typography variant="h4" component="h1">Где бабки Любовский?</Typography>
+                <Typography variant="h4" component="h1">Финансы</Typography>
                 <ButtonGroup variant="contained">
                     <Button color="success" startIcon={<AddIcon/>} onClick={() => setModalType('INCOME')}>Доход</Button>
                     <Button color="error" startIcon={<RemoveIcon/>}
@@ -222,7 +226,7 @@ export const FinancePage = () => {
                                 const selected = accountTypesFilter.find(t => t.label === e.target.value);
                                 if (selected) {
                                     setSelectedAccountType(selected.value);
-                                    setSelectedAccount(null);
+                                    setSelectedAccountId(null);
                                     setActiveFilters(prev => ({...prev, accountId: null}));
                                 }
                             }}
@@ -235,7 +239,6 @@ export const FinancePage = () => {
                             ))}
                         </TextField>
                     </Grid>
-
                     <Grid size={{xs: 12, md: 4}}>
                         <Autocomplete
                             options={filteredAccounts}
@@ -271,9 +274,8 @@ export const FinancePage = () => {
                         />
                     </Grid>
                     <Grid size={{xs: 12, md: 1}}>
-
                         <Button variant="outlined" fullWidth startIcon={<SearchIcon/>} onClick={handleDateFilterApply}
-                                disabled={!selectedAccount}>
+                                disabled={!selectedAccountId}>
                             Найти
                         </Button>
                     </Grid>
@@ -305,7 +307,7 @@ export const FinancePage = () => {
             )}
 
             <Box sx={{height: 600, width: '100%'}}>
-                {!selectedAccount ? (
+                {!selectedAccountId ? (
                     <Box sx={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         height: '100%', border: '1px dashed grey', borderRadius: 1, bgcolor: '#fafafa'
@@ -338,10 +340,12 @@ export const FinancePage = () => {
                     initialType={modalType}
                 />
             )}
+
             <TransactionDetailsModal
                 transactionId={selectedTransactionId}
                 onClose={() => setSelectedTransactionId(null)}
             />
+
             <TransactionCancellationDialog
                 transactionId={transactionToCancel}
                 onClose={() => setTransactionToCancel(null)}

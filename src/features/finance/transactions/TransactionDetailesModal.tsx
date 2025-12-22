@@ -22,6 +22,7 @@ import {useFinanceTransactions} from '../hooks/useFinanceTransaction';
 import {formatAppDate} from '../../../lib/formatDate';
 import {formatCurrency} from '../../../lib/formatCurrency';
 import TelegramIcon from '@mui/icons-material/Telegram';
+import {useFinanceDirectories} from '../hooks/useFinanceDirectories';
 
 interface TransactionDetailsModalProps {
     transactionId: number | null;
@@ -43,6 +44,19 @@ const typeLabels: Record<string, string> = {
 export const TransactionDetailsModal = ({transactionId, onClose}: TransactionDetailsModalProps) => {
     const {useTransactionDetails} = useFinanceTransactions();
     const {data: transaction, isLoading, isError} = useTransactionDetails(transactionId);
+    const {useAccountDetails} = useFinanceDirectories();
+
+    let counterpartyId: number | null = null;
+    if (transaction) {
+        if (['SUPPLIER_INVOICE', 'PAYMENT_TO_SUPP'].includes(transaction.operationType)) {
+            counterpartyId = transaction.fromAccountId || null;
+        } else if (['DEALER_INVOICE', 'PAYMENT_FROM_DLR'].includes(transaction.operationType)) {
+            counterpartyId = transaction.operationType === 'DEALER_INVOICE'
+                ? transaction.toAccountId || null
+                : transaction.fromAccountId || null;
+        }
+    }
+    const {data: counterparty} = useAccountDetails(counterpartyId);
 
     const handleShareToTelegram = () => {
         if (!transaction) return;
@@ -56,6 +70,10 @@ export const TransactionDetailsModal = ({transactionId, onClose}: TransactionDet
         message += `📂 Тип: ${typeLabel}\n`;
         message += `💰 Общая сумма: ${amountStr}\n`;
         message += `-----------------------------\n`;
+
+        if (counterparty) {
+            message += `⚖️ Текущий долг: ${formatCurrency(counterparty.balance)}\n`;
+        }
 
         if (transaction.fromAccountName) message += `📤 Списано с: ${transaction.fromAccountName}\n`;
         if (transaction.toAccountName) message += `📥 Зачислено на: ${transaction.toAccountName}\n`;
@@ -73,22 +91,22 @@ export const TransactionDetailsModal = ({transactionId, onClose}: TransactionDet
             message += `-----------------------------\n`;
             message += `📦 Состав операции:\n`;
 
-            message += '```\n';
+            message += '\n';
 
             transaction.items.forEach((item) => {
                 const itemName = item.productName.length > 10
                     ? item.productName.slice(0, 10) + '…'
                     : item.productName;
 
-                const pricePerUnit = formatCurrency(item.priceSnapshot); // цена за 1 шт
+                const pricePerUnit = formatCurrency(item.priceSnapshot);
                 const quantity = item.quantity;
                 const total = formatCurrency(item.totalAmount);
 
-                const line = `${itemName.padEnd(15)} | ${pricePerUnit.padStart(10)} | ${String(quantity).padStart(3)} шт | ${total.padStart(10)}\n`;
+                const line = `${itemName.padEnd(15)}${pricePerUnit.padStart(10)} *${String(quantity).padStart(3)} = ${total.padStart(9)}\n`;
                 message += line;
             });
 
-            message += '```\n';
+            message += '\n';
         }
 
         const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent('Apititto ERP')}&text=${encodeURIComponent(message)}`;

@@ -13,8 +13,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <BrowserRouter>
             <QueryClientProvider client={queryClient}>
                 <AuthProvider>
-                    <CssBaseline />
-                    <App />
+                    <CssBaseline/>
+                    <App/>
                 </AuthProvider>
             </QueryClientProvider>
         </BrowserRouter>

@@ -32,6 +32,7 @@ const fetchMovementHistory = async (
         page: paginationModel.page,
         size: paginationModel.pageSize,
         warehouseId: warehouseId ?? undefined,
+        sort: 'movementTime,desc',
     };
 
     if (dateFrom) {

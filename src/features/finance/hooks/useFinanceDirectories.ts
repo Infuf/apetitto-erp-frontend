@@ -23,6 +23,11 @@ const fetchCategories = async (): Promise<FinanceCategory[]> => {
     return data;
 };
 
+const fetchAccountById = async (id: number): Promise<FinanceAccount> => {
+    const {data} = await axiosInstance.get(`/finance/accounts/${id}`);
+    return data;
+};
+
 const createCategory = async (data: CategoryFormData): Promise<FinanceCategory> => {
     const { data: result } = await axiosInstance.post('/finance/categories', data);
     return result;
@@ -51,6 +56,12 @@ export const useFinanceDirectories = () => {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['financeAccounts'] }),
     });
 
+    const useAccountDetails = (id: number | null | undefined) => useQuery({
+        queryKey: ['financeAccount', id],
+        queryFn: () => fetchAccountById(id!),
+        enabled: !!id,
+    });
+
     const deleteAccountMutation = useMutation({
         mutationFn: deleteAccount,
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['financeAccounts'] }),
@@ -68,6 +79,7 @@ export const useFinanceDirectories = () => {
 
     return {
         useAccounts,
+        useAccountDetails,
         categories,
         isLoadingCategories,
         createAccount: createAccountMutation,
