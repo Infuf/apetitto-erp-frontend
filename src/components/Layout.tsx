@@ -123,7 +123,7 @@ const operationsItems = [
         text: 'Складские операции',
         path: '/movements',
         icon: <SyncAltIcon/>,
-        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER','ROLE_OWNER']
     },
     {
         text: 'Перемещения',
