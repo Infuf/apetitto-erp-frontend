@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Box, Button, TextField, Typography, ButtonGroup, LinearProgress } from '@mui/material';
-import { format, startOfMonth, subDays, startOfWeek, endOfWeek, endOfMonth } from 'date-fns';
+import {useState} from 'react';
+import {Box, Button, ButtonGroup, LinearProgress, TextField, Typography} from '@mui/material';
+import {endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subDays} from 'date-fns';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import { useFinanceAnalytics } from '../../../finance/hooks/useFinanceAnalytics.ts';
-import { FinancialStateCards } from './FinancialStateCards.tsx';
-import { FinanceCharts } from './FinanceCharts.tsx';
+import {useFinanceAnalytics} from '../../../finance/hooks/useFinanceAnalytics.ts';
+import {FinancialStateCards} from './FinancialStateCards.tsx';
+import {FinanceCharts} from './FinanceCharts.tsx';
 
 export const FinanceAnalyticsTab = () => {
     const [dateFrom, setDateFrom] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -66,7 +66,6 @@ export const FinanceAnalyticsTab = () => {
     };
 
     const isLoading = isStateLoading || isIncomeLoading || isExpenseLoading;
-
     return (
         <Box>
             {/* Заголовок и фильтры */}
