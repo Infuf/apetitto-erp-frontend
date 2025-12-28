@@ -117,7 +117,7 @@ const operationsItems = [
         text: 'Остатки на складе',
         path: '/stock',
         icon: <AssessmentIcon/>,
-        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER']
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER','ROLE_OWNER']
     },
     {
         text: 'Складские операции',
@@ -129,7 +129,7 @@ const operationsItems = [
         text: 'Перемещения',
         path: '/transfers',
         icon: <CompareArrowsIcon/>,
-        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER', 'ROLE_STORE_MANAGER']
+        roles: ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER', 'ROLE_STORE_MANAGER','ROLE_OWNER']
     },
 ];
 const financeItems = [
