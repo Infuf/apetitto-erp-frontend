@@ -30,6 +30,7 @@
     "react-number-format": "^5.4.4",
     "react-number-formatter": "^1.0.29",
     "react-router-dom": "^7.9.4",
+    "recharts": "^3.6.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

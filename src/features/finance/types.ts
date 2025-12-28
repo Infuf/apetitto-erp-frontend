@@ -113,3 +113,56 @@ export interface FinanceFilters {
 export interface CancellationRequestDto {
     reason: string;
 }
+
+export interface AccountSummary {
+    id: number;
+    name: string;
+    amount: number;
+}
+
+export interface MoneyState {
+    totalAmount: number;
+    details: AccountSummary[];
+}
+
+export interface DebtState {
+    totalAmount: number;
+    topDebtors: AccountSummary[]; // Список топ контрагентов
+}
+
+export interface CompanyFinancialStateDto {
+    money: MoneyState;
+    receivables: DebtState;
+    payables: DebtState;
+    netBalance: number;
+}
+
+
+export interface ReportSubCategoryDto {
+    subCategoryName: string;
+    amount: number;
+}
+
+export interface CategoryExpenseDto {
+    categoryName: string;
+    amount: number;
+    percentage: number;
+    subcategories: ReportSubCategoryDto[];
+}
+
+export interface ExpenseReportDto {
+    totalExpense: number;
+    categories: CategoryExpenseDto[];
+}
+
+export interface CategoryIncomeDto {
+    categoryName: string;
+    amount: number;
+    percentage: number;
+    subcategories: ReportSubCategoryDto[];
+}
+
+export interface IncomeReportDto {
+    totalIncome: number;
+    categories: CategoryIncomeDto[];
+}

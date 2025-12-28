@@ -24,3 +24,20 @@ export interface StockPageResponse {
     number: number;
     size: number;
 }
+
+export interface DashboardStockItemDto {
+    warehouseId: number;
+    warehouseName: string;
+    productName: string;
+    quantity: number;
+    calculatedValue: number;
+    valuationType: 'COST' | 'PRICE';
+}
+
+export interface IncomingStockReportDto {
+    warehouseName: string;
+    productName: string;
+    totalQuantity: number;
+    pricePerUnit: number;
+    totalAmount: number;
+}
