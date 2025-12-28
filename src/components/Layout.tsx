@@ -38,9 +38,10 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import {Can} from './Can.tsx';
 import {funnyTitles} from '../constants/titles';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'; // Журнал
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'; // Счета
-import ClassIcon from '@mui/icons-material/Class'; // Категории фин.
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import ClassIcon from '@mui/icons-material/Class';
+import PieChartIcon from '@mui/icons-material/PieChart'
 
 const drawerWidth = 240;
 
@@ -132,6 +133,12 @@ const operationsItems = [
     },
 ];
 const financeItems = [
+    {
+        text: 'Фобии',
+        path: '/analytics',
+        icon: <PieChartIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER']
+    },
     {
         text: 'Бабки',
         path: '/finance/transactions',
