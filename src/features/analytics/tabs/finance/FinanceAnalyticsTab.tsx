@@ -79,7 +79,7 @@ export const FinanceAnalyticsTab = () => {
                 gap: 2
             }}>
                 <Typography variant="h4" component="h1">
-                    Финансовая аналитика
+                    Аналитика Баксов
                 </Typography>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>

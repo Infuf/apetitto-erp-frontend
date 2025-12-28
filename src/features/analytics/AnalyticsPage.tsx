@@ -24,7 +24,7 @@ export const AnalyticsPage = () => {
     return (
         <Box>
             <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-                Центр Аналитики
+                Центр Фобий
             </Typography>
 
             <Paper sx={{ width: '100%' }}>
@@ -36,8 +36,8 @@ export const AnalyticsPage = () => {
                     variant="scrollable"
                     scrollButtons="auto"
                 >
-                    <Tab icon={<PieChartIcon />} iconPosition="start" label="Финансы" />
-                    <Tab icon={<WarehouseIcon />} iconPosition="start" label="Склад и Запасы" />
+                    <Tab icon={<PieChartIcon />} iconPosition="start" label="Где бабки?" />
+                    <Tab icon={<WarehouseIcon />} iconPosition="start" label="Склад - кладбище денег" />
                     {/* Сюда можно будет добавить HR, Продажи и т.д. */}
                 </Tabs>
             </Paper>

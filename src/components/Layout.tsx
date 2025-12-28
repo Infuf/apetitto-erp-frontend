@@ -134,7 +134,7 @@ const operationsItems = [
 ];
 const financeItems = [
     {
-        text: 'Аналитика',
+        text: 'Фобии',
         path: '/analytics',
         icon: <PieChartIcon/>,
         roles: ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER']
