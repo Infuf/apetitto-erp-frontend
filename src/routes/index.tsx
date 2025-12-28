@@ -22,7 +22,7 @@ import {AnalyticsPage} from "../features/analytics/AnalyticsPage.tsx";
 const RootRedirect = () => {
     const {user} = useAuth();
 
-    const dashboardRoles = ['ROLE_ADMIN', 'ROLE_OWNER'];
+    const dashboardRoles = ['ROLE_ADMIN', 'ROLE_OWNER','ROLE_FINANCE_OFFICER'];
 
     const canViewDashboard = user?.roles.some(role => dashboardRoles.includes(role));
 
