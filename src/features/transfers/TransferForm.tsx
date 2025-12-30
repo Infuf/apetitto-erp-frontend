@@ -8,8 +8,10 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControlLabel,
     IconButton,
     Paper,
+    Switch,
     Table,
     TableBody,
     TableCell,
@@ -65,8 +67,12 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
     });
 
     useEffect(() => {
-        if (!open) {
-            setSourceWarehouseId(null);
+        if (open) {
+            const savedId = localStorage.getItem(LAST_SOURCE_WAREHOUSE_KEY);
+            if (savedId) {
+                setSourceWarehouseId(Number(savedId));
+            }
+        } else {
             setDestinationWarehouseId(null);
             setItems([]);
             setSelectedProduct(null);
@@ -83,13 +89,12 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                 alert('Этот товар уже добавлен.');
                 return prev;
             }
-            const newItems = [...prev, {
+            return [...prev, {
                 productId: selectedProduct.id,
                 quantity: quantity,
                 productName: selectedProduct.name,
                 productCode: selectedProduct.productCode,
             }];
-            return newItems;
         });
         setSelectedProduct(null);
         setQuantity(1);
@@ -111,11 +116,13 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
             quantity: item.quantity,
         }));
 
-        onSubmit({sourceWarehouseId, destinationWarehouseId, items: itemsToSubmit});
+        onSubmit({sourceWarehouseId, destinationWarehouseId, isAutoInbound, items: itemsToSubmit});
     };
 
     const isDestinationDisabled = !sourceWarehouseId;
     const destinationOptions = warehouses.filter(w => w.id !== sourceWarehouseId);
+    const [isAutoInbound, setIsAutoInbound] = useState<boolean>(true);
+    const LAST_SOURCE_WAREHOUSE_KEY = 'transfer:lastSourceWarehouseId';
 
     return (
         <Dialog
@@ -130,8 +137,12 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                         getOptionLabel={(option) => option.name}
                         value={warehouses.find(w => w.id === sourceWarehouseId) || null}
                         onChange={(_, newValue) => {
+                            const id = newValue?.id || null;
                             setSourceWarehouseId(newValue?.id || null);
                             setDestinationWarehouseId(null);
+                            if (id) {
+                                localStorage.setItem(LAST_SOURCE_WAREHOUSE_KEY, String(id));
+                            }
                         }}
                         loading={isLoadingWarehouses}
                         fullWidth
@@ -148,7 +159,15 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                         renderInput={(params) => <TextField {...params} label="Склад-получатель"/>}
                     />
                 </Box>
-
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={isAutoInbound}
+                            onChange={(e) => setIsAutoInbound(e.target.checked)}
+                        />
+                    }
+                    label="Автоматически оприходовать товар на склад-отправитель"
+                />
                 <Typography variant="h6" gutterBottom>2. Добавьте товары</Typography>
                 <Paper elevation={2} sx={{p: 2, display: 'flex', gap: 2, alignItems: 'center', mb: 2}}>
                     <Autocomplete

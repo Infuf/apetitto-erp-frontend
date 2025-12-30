@@ -25,6 +25,7 @@ export interface TransferOrder {
 export interface TransferOrderRequestDto {
     sourceWarehouseId: number;
     destinationWarehouseId: number;
+    isAutoInbound: boolean;
     items: Item[];
 }
 
