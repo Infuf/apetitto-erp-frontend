@@ -1,6 +1,7 @@
 export interface Item {
     productId: number;
     quantity: number;
+    price: number;
     costPrice?: number;
 }
 
@@ -19,7 +20,7 @@ export interface TransferOrder {
     createdAt: string;
     shippedAt?: string;
     receivedAt?: string;
-    items: (Item & { productName?: string; productCode?: string })[];
+    items: (Item & { productName?: string; productCode?: string; sellingPrice: number })[];
 }
 
 export interface TransferOrderRequestDto {
@@ -50,4 +51,5 @@ export interface ProductOption {
     id: number;
     name: string;
     productCode: string;
+    sellingPrice: number;
 }

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
     Autocomplete,
     Box,
@@ -16,6 +16,7 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableFooter,
     TableHead,
     TableRow,
     TextField,
@@ -35,6 +36,16 @@ interface TransferFormProps {
     isSubmitting: boolean;
 }
 
+interface LocalTransferItem extends TransferItem {
+    productName?: string;
+    productCode?: string;
+    price: number;
+}
+
+const formatMoney = (amount: number) => {
+    return new Intl.NumberFormat('ru-RU').format(amount);
+};
+
 const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
     const {data} = await axiosInstance.get('/warehouses');
     return data;
@@ -42,25 +53,34 @@ const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
 
 const searchProducts = async (name: string): Promise<ProductOption[]> => {
     if (!name || name.length < 3) return [];
-    const {data} = await axiosInstance.get('/products/search', {params: {name}});
+    const {data} = await axiosInstance.get('/products/search', {
+        params: {
+            name,
+            size: 20
+        }
+    });
     return data.content || [];
 };
 
 export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFormProps) => {
     const LAST_SOURCE_WAREHOUSE_KEY = 'transfer:lastSourceWarehouseId';
+
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const [sourceWarehouseId, setSourceWarehouseId] = useState<number | null>(null);
     const [destinationWarehouseId, setDestinationWarehouseId] = useState<number | null>(null);
-    const [items, setItems] = useState<(TransferItem & {
-        productName?: string;
-        productCode?: string;
-        productPrice?: number
-    })[]>([]);
+    const [items, setItems] = useState<LocalTransferItem[]>([]);
 
     const [productSearchInput, setProductSearchInput] = useState('');
     const [debouncedProductInput, setDebouncedProductInput] = useState('');
     const [selectedProduct, setSelectedProduct] = useState<ProductOption | null>(null);
     const [quantity, setQuantity] = useState<number | ''>(1);
     const [isAutoInbound, setIsAutoInbound] = useState<boolean>(true);
+
+    const totalOrderSum = useMemo(() => {
+        return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }, [items]);
+
     useEffect(() => {
         const handler = setTimeout(() => setDebouncedProductInput(productSearchInput), 300);
         return () => clearTimeout(handler);
@@ -74,7 +94,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
     const {data: productOptions = [], isLoading: isLoadingProducts} = useQuery({
         queryKey: ['productSearch', debouncedProductInput],
         queryFn: () => searchProducts(debouncedProductInput),
-        enabled: debouncedProductInput.length >= 3,
+        enabled: debouncedProductInput.length >= 3 && !selectedProduct,
         staleTime: 5 * 60 * 1000,
     });
 
@@ -82,6 +102,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
         if (open) {
             const savedId = localStorage.getItem(LAST_SOURCE_WAREHOUSE_KEY);
             if (savedId) setSourceWarehouseId(Number(savedId));
+
         } else {
             setDestinationWarehouseId(null);
             setItems([]);
@@ -93,6 +114,9 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
 
     const handleAddItem = () => {
         if (!selectedProduct || !quantity || quantity <= 0) return;
+
+        const productPrice = selectedProduct.sellingPrice || 0;
+
         setItems(prev => {
             const existingItem = prev.find(item => item.productId === selectedProduct.id);
             if (existingItem) {
@@ -101,14 +125,20 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
             }
             return [...prev, {
                 productId: selectedProduct.id,
-                quantity,
+                quantity: Number(quantity),
                 productName: selectedProduct.name,
                 productCode: selectedProduct.productCode,
+                price: productPrice,
             }];
         });
+
         setSelectedProduct(null);
         setQuantity(1);
         setProductSearchInput('');
+
+        setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 0);
     };
 
     const handleRemoveItem = (productId: number) => setItems(prev => prev.filter(item => item.productId !== productId));
@@ -118,15 +148,26 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
             alert('Пожалуйста, выберите склады (они не должны совпадать) и добавьте хотя бы один товар.');
             return;
         }
-        const itemsToSubmit = items.map(item => ({productId: item.productId, quantity: item.quantity}));
-        onSubmit({sourceWarehouseId, destinationWarehouseId, isAutoInbound, items: itemsToSubmit});
+
+        const itemsToSubmit = items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price
+        }));
+
+        onSubmit({
+            sourceWarehouseId,
+            destinationWarehouseId,
+            isAutoInbound,
+            items: itemsToSubmit
+        });
     };
 
     const isDestinationDisabled = !sourceWarehouseId;
     const destinationOptions = warehouses.filter(w => w.id !== sourceWarehouseId);
 
     return (
-        <Dialog open={open} maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting}>
+        <Dialog open={open} maxWidth="lg" fullWidth disableEscapeKeyDown={isSubmitting}>
             <DialogTitle>Создание перемещения</DialogTitle>
             <DialogContent>
                 <Typography variant="h6" gutterBottom sx={{mt: 2}}>1. Выберите склады</Typography>
@@ -160,6 +201,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                     control={<Switch checked={isAutoInbound} onChange={(e) => setIsAutoInbound(e.target.checked)}/>}
                     label="Автоматически оприходовать товар на склад-отправитель"
                 />
+
                 <Typography variant="h6" gutterBottom>2. Добавьте товары</Typography>
                 <Paper elevation={2} sx={{p: 2, display: 'flex', gap: 2, alignItems: 'center', mb: 2}}>
                     <Autocomplete
@@ -174,6 +216,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                         renderInput={(params) => (
                             <TextField
                                 {...params}
+                                inputRef={searchInputRef}
                                 label="Поиск товара"
                                 InputProps={{
                                     ...params.InputProps,
@@ -207,6 +250,8 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                                 <TableCell>Артикул</TableCell>
                                 <TableCell>Наименование</TableCell>
                                 <TableCell align="right">Количество</TableCell>
+                                <TableCell align="right">Цена</TableCell>
+                                <TableCell align="right">Сумма</TableCell>
                                 <TableCell align="center">Действия</TableCell>
                             </TableRow>
                         </TableHead>
@@ -216,6 +261,10 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                                     <TableCell>{item.productCode}</TableCell>
                                     <TableCell>{item.productName}</TableCell>
                                     <TableCell align="right">{item.quantity}</TableCell>
+                                    <TableCell align="right">{formatMoney(item.price)}</TableCell>
+                                    <TableCell align="right" sx={{fontWeight: 'bold'}}>
+                                        {formatMoney(item.price * item.quantity)}
+                                    </TableCell>
                                     <TableCell align="center">
                                         <IconButton size="small" onClick={() => handleRemoveItem(item.productId)}>
                                             <DeleteIcon fontSize="small"/>
@@ -223,7 +272,28 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            {items.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center" sx={{py: 3, color: 'text.secondary'}}>
+                                        Товары не добавлены
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
+
+                        {items.length > 0 && (
+                            <TableFooter>
+                                <TableRow>
+                                    <TableCell colSpan={4} align="right" sx={{fontWeight: 'bold', fontSize: '1rem'}}>
+                                        ИТОГО:
+                                    </TableCell>
+                                    <TableCell align="right" sx={{fontWeight: 'bold', fontSize: '1rem'}}>
+                                        {formatMoney(totalOrderSum)}
+                                    </TableCell>
+                                    <TableCell/>
+                                </TableRow>
+                            </TableFooter>
+                        )}
                     </Table>
                 </TableContainer>
             </DialogContent>
