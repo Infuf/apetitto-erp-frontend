@@ -41,19 +41,30 @@ const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
 };
 
 const searchProducts = async (name: string): Promise<ProductOption[]> => {
-    if (!name || name.length < 2) return [];
+    if (!name || name.length < 3) return [];
     const {data} = await axiosInstance.get('/products/search', {params: {name}});
     return data.content || [];
 };
 
 export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFormProps) => {
+    const LAST_SOURCE_WAREHOUSE_KEY = 'transfer:lastSourceWarehouseId';
     const [sourceWarehouseId, setSourceWarehouseId] = useState<number | null>(null);
     const [destinationWarehouseId, setDestinationWarehouseId] = useState<number | null>(null);
-    const [items, setItems] = useState<(TransferItem & { productName?: string; productCode?: string })[]>([]);
+    const [items, setItems] = useState<(TransferItem & {
+        productName?: string;
+        productCode?: string;
+        productPrice?: number
+    })[]>([]);
 
     const [productSearchInput, setProductSearchInput] = useState('');
+    const [debouncedProductInput, setDebouncedProductInput] = useState('');
     const [selectedProduct, setSelectedProduct] = useState<ProductOption | null>(null);
     const [quantity, setQuantity] = useState<number | ''>(1);
+    const [isAutoInbound, setIsAutoInbound] = useState<boolean>(true);
+    useEffect(() => {
+        const handler = setTimeout(() => setDebouncedProductInput(productSearchInput), 300);
+        return () => clearTimeout(handler);
+    }, [productSearchInput]);
 
     const {data: warehouses = [], isLoading: isLoadingWarehouses} = useQuery({
         queryKey: ['warehouses'],
@@ -61,17 +72,16 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
     });
 
     const {data: productOptions = [], isLoading: isLoadingProducts} = useQuery({
-        queryKey: ['productSearch', productSearchInput],
-        queryFn: () => searchProducts(productSearchInput),
-        enabled: !!productSearchInput,
+        queryKey: ['productSearch', debouncedProductInput],
+        queryFn: () => searchProducts(debouncedProductInput),
+        enabled: debouncedProductInput.length >= 3,
+        staleTime: 5 * 60 * 1000,
     });
 
     useEffect(() => {
         if (open) {
             const savedId = localStorage.getItem(LAST_SOURCE_WAREHOUSE_KEY);
-            if (savedId) {
-                setSourceWarehouseId(Number(savedId));
-            }
+            if (savedId) setSourceWarehouseId(Number(savedId));
         } else {
             setDestinationWarehouseId(null);
             setItems([]);
@@ -91,7 +101,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
             }
             return [...prev, {
                 productId: selectedProduct.id,
-                quantity: quantity,
+                quantity,
                 productName: selectedProduct.name,
                 productCode: selectedProduct.productCode,
             }];
@@ -101,33 +111,22 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
         setProductSearchInput('');
     };
 
-    const handleRemoveItem = (productId: number) => {
-        setItems(prev => prev.filter(item => item.productId !== productId));
-    };
+    const handleRemoveItem = (productId: number) => setItems(prev => prev.filter(item => item.productId !== productId));
 
     const handleSubmit = () => {
         if (!sourceWarehouseId || !destinationWarehouseId || sourceWarehouseId === destinationWarehouseId || items.length === 0) {
             alert('Пожалуйста, выберите склады (они не должны совпадать) и добавьте хотя бы один товар.');
             return;
         }
-
-        const itemsToSubmit = items.map((item: { productId: number; quantity: number }) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-        }));
-
+        const itemsToSubmit = items.map(item => ({productId: item.productId, quantity: item.quantity}));
         onSubmit({sourceWarehouseId, destinationWarehouseId, isAutoInbound, items: itemsToSubmit});
     };
 
     const isDestinationDisabled = !sourceWarehouseId;
     const destinationOptions = warehouses.filter(w => w.id !== sourceWarehouseId);
-    const [isAutoInbound, setIsAutoInbound] = useState<boolean>(true);
-    const LAST_SOURCE_WAREHOUSE_KEY = 'transfer:lastSourceWarehouseId';
 
     return (
-        <Dialog
-            open={open}
-            maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting}>
+        <Dialog open={open} maxWidth="md" fullWidth disableEscapeKeyDown={isSubmitting}>
             <DialogTitle>Создание перемещения</DialogTitle>
             <DialogContent>
                 <Typography variant="h6" gutterBottom sx={{mt: 2}}>1. Выберите склады</Typography>
@@ -138,11 +137,9 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                         value={warehouses.find(w => w.id === sourceWarehouseId) || null}
                         onChange={(_, newValue) => {
                             const id = newValue?.id || null;
-                            setSourceWarehouseId(newValue?.id || null);
+                            setSourceWarehouseId(id);
                             setDestinationWarehouseId(null);
-                            if (id) {
-                                localStorage.setItem(LAST_SOURCE_WAREHOUSE_KEY, String(id));
-                            }
+                            if (id) localStorage.setItem(LAST_SOURCE_WAREHOUSE_KEY, String(id));
                         }}
                         loading={isLoadingWarehouses}
                         fullWidth
@@ -160,12 +157,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                     />
                 </Box>
                 <FormControlLabel
-                    control={
-                        <Switch
-                            checked={isAutoInbound}
-                            onChange={(e) => setIsAutoInbound(e.target.checked)}
-                        />
-                    }
+                    control={<Switch checked={isAutoInbound} onChange={(e) => setIsAutoInbound(e.target.checked)}/>}
                     label="Автоматически оприходовать товар на склад-отправитель"
                 />
                 <Typography variant="h6" gutterBottom>2. Добавьте товары</Typography>
@@ -201,6 +193,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                         sx={{width: 120}}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
                     />
                     <IconButton color="primary" onClick={handleAddItem} disabled={!selectedProduct || !quantity}>
                         <AddCircleOutlineIcon/>
