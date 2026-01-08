@@ -265,7 +265,7 @@ export const Layout = () => {
                     >
                         {title}
                     </Typography>
-                    {!isMobile && <Typography sx={{mr: 2}}>{user?.username}</Typography>} {/* На мобилке можно скрыть имя, если не влезает */}
+                    {!isMobile && <Typography sx={{mr: 2}}>{user?.username}</Typography>}
                     <Button color="inherit" onClick={logout}>Выход</Button>
                 </Toolbar>
             </AppBar>
