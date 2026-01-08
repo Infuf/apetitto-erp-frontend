@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
     Autocomplete,
     Box,
@@ -37,7 +37,6 @@ interface MovementFormProps {
     movementType: MovementType;
 }
 
-
 const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
     const {data} = await axiosInstance.get('/warehouses');
     return data;
@@ -50,10 +49,9 @@ const fetchAccounts = async (): Promise<FinanceAccount[]> => {
 
 const searchProducts = async (name: string): Promise<ProductOption[]> => {
     if (!name) return [];
-    const {data} = await axiosInstance.get('/products/search', {params: {name}});
+    const {data} = await axiosInstance.get('/products/search', {params: {name, size: 20}});
     return data.content || [];
 };
-
 
 const formTitles: Record<MovementType, string> = {
     INBOUND: 'Новый приход',
@@ -62,16 +60,26 @@ const formTitles: Record<MovementType, string> = {
 };
 
 export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementType}: MovementFormProps) => {
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const [warehouseId, setWarehouseId] = useState<number | null>(null);
     const [accountId, setAccountId] = useState<number | null>(null);
     const [comment, setComment] = useState('');
     const [items, setItems] = useState<MovementItem[]>([]);
 
     const [productSearchInput, setProductSearchInput] = useState('');
+    const [debouncedProductInput, setDebouncedProductInput] = useState('');
+
     const [selectedProduct, setSelectedProduct] = useState<ProductOption | null>(null);
     const [quantity, setQuantity] = useState<number | ''>(1);
     const [costPrice, setCostPrice] = useState<number | ''>('');
 
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedProductInput(productSearchInput);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [productSearchInput]);
 
     const {data: warehouses = [], isLoading: isLoadingWarehouses} = useQuery({
         queryKey: ['warehouses'],
@@ -85,11 +93,10 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
     });
 
     const {data: productOptions = [], isLoading: isLoadingProducts} = useQuery({
-        queryKey: ['productSearch', productSearchInput],
-        queryFn: () => searchProducts(productSearchInput),
-        enabled: !!productSearchInput,
+        queryKey: ['productSearch', debouncedProductInput],
+        queryFn: () => searchProducts(debouncedProductInput),
+        enabled: debouncedProductInput.length > 2 && !selectedProduct,
     });
-
 
     useEffect(() => {
         if (!open) {
@@ -100,6 +107,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
             setSelectedProduct(null);
             setQuantity(1);
             setCostPrice('');
+            setProductSearchInput('');
         }
     }, [open]);
 
@@ -159,6 +167,10 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
         setQuantity(movementType === 'ADJUSTMENT' ? '' : 1);
         setCostPrice('');
         setProductSearchInput('');
+
+        setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 0);
     };
 
     const handleRemoveItem = (productId: number) => {
@@ -235,7 +247,22 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                         onInputChange={(_, newInputValue) => setProductSearchInput(newInputValue)}
                         loading={isLoadingProducts}
                         sx={{flexGrow: 1}}
-                        renderInput={(params) => <TextField {...params} label="Поиск товара"/>}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                inputRef={searchInputRef}
+                                label="Поиск товара"
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <>
+                                            {isLoadingProducts ? <CircularProgress color="inherit" size={20}/> : null}
+                                            {params.InputProps.endAdornment}
+                                        </>
+                                    ),
+                                }}
+                            />
+                        )}
                     />
                     <TextField
                         label={quantityLabel}
@@ -243,6 +270,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                         sx={{width: 150}}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
                     />
                     {movementType === 'INBOUND' && (
                         <NumericFormat
@@ -256,6 +284,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                             onValueChange={(values) => {
                                 setCostPrice(values.floatValue ?? '');
                             }}
+                            onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
                             sx={{width: 150}}
                         />
                     )}
