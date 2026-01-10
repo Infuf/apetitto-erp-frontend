@@ -149,6 +149,13 @@ export const FinancePage = () => {
             headerName: 'Сумма',
             width: 140,
             renderCell: (params) => {
+                if (!selectedAccountId) {
+                    return (
+                        <span style={{fontWeight: 'bold'}}>
+                    {formatCurrency(params.value)}
+                </span>
+                    );
+                }
                 const isOutgoing = params.row.fromAccountId === selectedAccountId;
                 const color = isOutgoing ? '#d32f2f' : '#2e7d32';
                 const prefix = isOutgoing ? '-' : '+';
@@ -161,6 +168,11 @@ export const FinancePage = () => {
             flex: 1.5,
             renderCell: (params) => {
                 const row = params.row;
+
+                if (!selectedAccountId) {
+                    return `${row.fromAccountName || '—'} → ${row.toAccountName || row.categoryName || '—'}`;
+                }
+
                 if (row.fromAccountId === selectedAccountId) {
                     return `➝ ${row.toAccountName || row.categoryName || 'Неизвестно'}`;
                 } else {
@@ -275,7 +287,7 @@ export const FinancePage = () => {
                     </Grid>
                     <Grid size={{xs: 12, md: 1}}>
                         <Button variant="outlined" fullWidth startIcon={<SearchIcon/>} onClick={handleDateFilterApply}
-                                disabled={!selectedAccountId}>
+                                disabled={false}>
                             Найти
                         </Button>
                     </Grid>
@@ -307,16 +319,6 @@ export const FinancePage = () => {
             )}
 
             <Box sx={{height: 600, width: '100%'}}>
-                {!selectedAccountId ? (
-                    <Box sx={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        height: '100%', border: '1px dashed grey', borderRadius: 1, bgcolor: '#fafafa'
-                    }}>
-                        <Typography color="text.secondary" variant="h6">
-                            Выберите счет сверху, чтобы увидеть историю операций
-                        </Typography>
-                    </Box>
-                ) : (
                     <DataGrid
                         rows={pageData?.content ?? []}
                         columns={columns}
@@ -328,7 +330,6 @@ export const FinancePage = () => {
                         disableRowSelectionOnClick
                         sx={{'& .MuiDataGrid-columnHeaders': {bgcolor: '#f5f5f5'}}}
                     />
-                )}
             </Box>
 
             {modalType && (

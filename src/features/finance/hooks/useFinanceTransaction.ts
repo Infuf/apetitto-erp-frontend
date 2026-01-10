@@ -61,7 +61,6 @@ export const useFinanceTransactions = () => {
             queryKey: ['financeTransactions', page, pageSize, filters],
             queryFn: () => fetchTransactions(page, pageSize, filters),
             placeholderData: keepPreviousData,
-            enabled: !!filters.accountId,
         });
 
     const createMutation = useMutation({
