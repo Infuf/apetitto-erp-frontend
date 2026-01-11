@@ -71,7 +71,7 @@ export const ProductForm = ({
                 name: '',
                 productCode: '',
                 unit: 'PIECE',
-                categoryId: null,
+                categoryId: undefined,
                 description: '',
                 barcode: '',
                 sellingPrice: undefined,

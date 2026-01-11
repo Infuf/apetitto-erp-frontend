@@ -16,21 +16,27 @@ import {FinanceAccountsPage} from "../features/finance/accounts/FinanceAccountsP
 import {CategoriesPage as FinanceCategoriesPage} from '../features/finance/categories/CategoryPage.tsx';
 import {FinancePage} from '../features/finance/FinancePage.tsx';
 import {FinanceAnalyticsTab} from '../features/analytics/tabs/finance/FinanceAnalyticsTab.tsx';
-import {useAuth} from "../context/AuthContext.tsx";
+import {useAuth} from "../context/useAuth.ts";
 import {AnalyticsPage} from "../features/analytics/AnalyticsPage.tsx";
+import {DepartmentsPage} from "..//features/hr/structure/DepartmentsPage.tsx"
+import {EmployeesPage} from "../features/hr/personnel/EmployeePage.tsx";
+import { EmployeeProfilePage } from "../features/hr/personnel/EmployeeProfilePage.tsx";
 
 const RootRedirect = () => {
-    const {user} = useAuth();
+    const { user } = useAuth();
 
-    const dashboardRoles = ['ROLE_ADMIN', 'ROLE_OWNER','ROLE_FINANCE_OFFICER'];
+    const managementRoles = ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER'];
+    const isManagement = user?.roles.some(role => managementRoles.includes(role));
 
-    const canViewDashboard = user?.roles.some(role => dashboardRoles.includes(role));
-
-    if (canViewDashboard) {
-        return <Navigate to="/analytics" replace/>;
+    if (isManagement) {
+        return <Navigate to="/analytics" replace />;
     }
 
-    return <Navigate to="/transfers" replace/>;
+    if (user?.employeeId) {
+        return <Navigate to={`/hr/employees/${user.employeeId}`} replace />;
+    }
+
+    return <Navigate to="/transfers" replace />;
 };
 
 export const AppRoutes = () => {
@@ -59,6 +65,10 @@ export const AppRoutes = () => {
                     <Route path="/finance/categories" element={<FinanceCategoriesPage/>}/>
                     <Route path="/finance/dashboard" element={<FinanceAnalyticsTab/>}/>
                     <Route path="/analytics" element={<AnalyticsPage/>}/>
+
+                    <Route path="/hr/departments" element={<DepartmentsPage/>}/>
+                    <Route path="/hr/employees" element={<EmployeesPage/>}/>
+                    <Route path="/hr/employees/:id" element={<EmployeeProfilePage />} />
 
                     <Route path="/admin/users" element={<UsersPage/>}/>
 
