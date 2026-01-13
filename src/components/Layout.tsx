@@ -19,9 +19,13 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
+import DomainIcon from '@mui/icons-material/Domain';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import {styled} from '@mui/material/styles';
-import {useAuth} from '../context/AuthContext';
+import {useAuth} from '../context/useAuth.ts';
 import logo from '../assets/logo.jpg';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import type {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import type {DrawerProps as MuiDrawerProps} from '@mui/material/Drawer';
@@ -118,6 +122,27 @@ const financeItems = [
     {text: 'Статьи (Категории)', path: '/finance/categories', icon: <ClassIcon/>, roles: ['ROLE_ADMIN', 'ROLE_OWNER', 'ROLE_FINANCE_OFFICER']},
 ];
 
+const hrItems = [
+    {
+        text: 'Структура компании',
+        path: '/hr/departments',
+        icon: <DomainIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_HR']
+    },
+    {
+        text: 'Сотрудники',
+        path: '/hr/employees',
+        icon: <PeopleAltIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_HR']
+    },
+    {
+        text: 'Табель (График)',
+        path: '/hr/attendance',
+        icon: <CalendarMonthIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_HR', 'ROLE_MANAGER']
+    },
+];
+
 const adminItems = [
     {text: 'Пользователи', path: '/admin/users', icon: <SupervisorAccountIcon/>, roles: ['ROLE_ADMIN']},
 ];
@@ -169,6 +194,32 @@ export const Layout = () => {
             </Toolbar>
             <Divider />
             <List component="nav">
+                {
+                    <>
+                        <ListItemButton
+                            component={NavLink}
+                            // @ts-expect-error ts-is pain
+                            to={`/hr/employees/${user.employeeId}`}
+                            onClick={handleNavClick}
+                            sx={{
+                                '&.active': {
+                                    backgroundColor: 'action.selected',
+                                    borderRight: `3px solid ${theme.palette.primary.main}`
+                                },
+                                mb: 1
+                            }}
+                        >
+                            <ListItemIcon>
+                                <AccountBoxIcon color="primary"/>
+                            </ListItemIcon>
+                            <ListItemText
+                                primary="Мой кабинет"
+                                primaryTypographyProps={{fontWeight: 'bold'}}
+                            />
+                        </ListItemButton>
+                        <Divider sx={{my: 1}}/>
+                    </>
+                }
                 {operationsItems.map((item) => (
                     <Can allowedRoles={item.roles} key={item.text}>
                         <ListItemButton
@@ -215,6 +266,19 @@ export const Layout = () => {
                             component={NavLink}
                             to={item.path}
                             onClick={handleNavClick}
+                            sx={{'&.active': {backgroundColor: 'action.selected'}}}
+                        >
+                            <ListItemIcon>{item.icon}</ListItemIcon>
+                            <ListItemText primary={item.text}/>
+                        </ListItemButton>
+                    </Can>
+                ))}
+                <Divider sx={{my: 1}}/>
+                {hrItems.map((item) => (
+                    <Can allowedRoles={item.roles} key={item.text}>
+                        <ListItemButton
+                            component={NavLink}
+                            to={item.path}
                             sx={{'&.active': {backgroundColor: 'action.selected'}}}
                         >
                             <ListItemIcon>{item.icon}</ListItemIcon>

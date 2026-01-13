@@ -24,14 +24,15 @@
     "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.19",
     "jwt-decode": "^4.0.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "react-hook-form": "^7.65.0",
     "react-number-format": "^5.4.4",
     "react-number-formatter": "^1.0.29",
-    "react-router-dom": "^7.9.4",
+    "react-router": "^7.12.0",
+    "react-router-dom": "^7.12.0",
     "recharts": "^3.6.0",
-    "zod": "^4.1.12"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -17,3 +17,11 @@ export const formatAppDate = (
         return 'Invalid Date';
     }
 };
+
+export const formatDuration = (minutes: number): string => {
+    if (!minutes) return '0';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h > 0) return `${h}s ${m}m`;
+    return `${m}m`;
+};

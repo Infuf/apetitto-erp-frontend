@@ -34,13 +34,15 @@ const userSchema = z.object({
 //        (6, 'ROLE_DEPARTMENT_MANAGER'),
 //        (7, 'ROLE_FINANCE_OFFICER'),
 //        (8, 'ROLE_OWNER')
+//        (2, 'ROLE_MANAGER')
 const availableRoles: RoleOption[] = [
-    { value: 'ROLE_USER', label: 'Пользователь' },
-    { value: 'ROLE_ADMIN', label: 'Администратор' },
-    { value: 'ROLE_STORE_MANAGER', label: 'Менеджер магазина' },
-    { value: 'ROLE_OWNER', label: 'Овнер' },
+    { value: 'ROLE_USER', label: 'Работяга' },
+    { value: 'ROLE_ADMIN', label: 'Без тормозов' },
+    { value: 'ROLE_STORE_MANAGER', label: 'Магазинчик' },
+    { value: 'ROLE_OWNER', label: 'ОВНЕР (страшно)' },
     { value: 'ROLE_FINANCE_OFFICER', label: 'Главный по бабкам' },
-    { value: 'ROLE_WAREHOUSE_MANAGER', label: 'Менеджер склада' },
+    { value: 'ROLE_WAREHOUSE_MANAGER', label: 'СкладМэн' },
+    { value: 'ROLE_MANAGER', label: 'Дэп мастер (Наверное)' },
 ];
 
 const fetchWarehouses = async (): Promise<WarehouseOption[]> => {
