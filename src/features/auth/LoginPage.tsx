@@ -1,27 +1,15 @@
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
-import {
-    Alert,
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    CircularProgress,
-    Link as MuiLink,
-    TextField,
-    Typography
-} from '@mui/material';
+import {useForm} from 'react-hook-form';
+import {z} from 'zod';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useNavigate} from 'react-router-dom';
+import {useMutation} from '@tanstack/react-query';
+import {useState} from 'react';
+import {Alert, Avatar, Box, Button, Card, CardContent, CircularProgress, TextField, Typography} from '@mui/material';
 
-import { axiosInstance } from '../../api/axiosInstance.ts';
-import { useAuth } from '../../context/useAuth.ts';
+import {axiosInstance} from '../../api/axiosInstance.ts';
+import {useAuth} from '../../context/useAuth.ts';
 import logo from '../../assets/logo.jpg';
-import { loginQuotes } from '../../constants/login-quotes';
-import { Link as RouterLink } from "react-router-dom";
+import {loginQuotes} from '../../constants/login-quotes';
 import type {AxiosError} from "axios";
 
 const loginSchema = z.object({
@@ -131,12 +119,6 @@ export const LoginPage = () => {
                             </Button>
                         </Box>
                     </form>
-                    <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-                        Нет аккаунта?{' '}
-                        <MuiLink component={RouterLink} to="/register" underline="hover">
-                            Зарегистрироваться
-                        </MuiLink>
-                    </Typography>
                 </CardContent>
             </Card>
         </Box>
