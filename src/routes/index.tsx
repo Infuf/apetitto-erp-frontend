@@ -20,7 +20,8 @@ import {useAuth} from "../context/useAuth.ts";
 import {AnalyticsPage} from "../features/analytics/AnalyticsPage.tsx";
 import {DepartmentsPage} from "..//features/hr/structure/DepartmentsPage.tsx"
 import {EmployeesPage} from "../features/hr/personnel/EmployeePage.tsx";
-import { EmployeeProfilePage } from "../features/hr/personnel/EmployeeProfilePage.tsx";
+import {EmployeeProfilePage} from "../features/hr/personnel/EmployeeProfilePage.tsx";
+import {AttendanceGridPage} from "../features/hr/attendance/components/AttendanceGridPage.tsx";
 
 const RootRedirect = () => {
     const { user } = useAuth();
@@ -69,6 +70,7 @@ export const AppRoutes = () => {
                     <Route path="/hr/departments" element={<DepartmentsPage/>}/>
                     <Route path="/hr/employees" element={<EmployeesPage/>}/>
                     <Route path="/hr/employees/:id" element={<EmployeeProfilePage />} />
+                    <Route path="/hr/attendance" element={<AttendanceGridPage/>}/>
 
                     <Route path="/admin/users" element={<UsersPage/>}/>
 

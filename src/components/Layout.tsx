@@ -25,6 +25,7 @@ import {styled} from '@mui/material/styles';
 import {useAuth} from '../context/useAuth.ts';
 import logo from '../assets/logo.jpg';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import type {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import type {DrawerProps as MuiDrawerProps} from '@mui/material/Drawer';
@@ -134,6 +135,12 @@ const hrItems = [
         icon: <PeopleAltIcon/>,
         roles: ['ROLE_ADMIN', 'ROLE_HR']
     },
+    {
+        text: 'Табель (График)',
+        path: '/hr/attendance',
+        icon: <CalendarMonthIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_HR', 'ROLE_MANAGER']
+    },
 ];
 
 const adminItems = [
@@ -191,6 +198,7 @@ export const Layout = () => {
                     <>
                         <ListItemButton
                             component={NavLink}
+                            // @ts-expect-error ts-is pain
                             to={`/hr/employees/${user.employeeId}`}
                             onClick={handleNavClick}
                             sx={{

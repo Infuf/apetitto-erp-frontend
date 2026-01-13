@@ -1,8 +1,66 @@
 export type SalaryType = 'HOURLY' | 'DAILY_SHIFT' | 'FIXED';
 
-export type AttendanceStatus =
-    | 'PRESENT'
-    | 'ABSENT';
+
+export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'FUTURE';
+
+export interface GridDayDto {
+    date: string;
+    status: AttendanceStatus;
+    checkIn?: string;
+    checkOut?: string;
+    shortcomingMinutes: number;
+    overtimeMinutes: number;
+    recordId?: number;
+}
+
+export interface EmployeeGridRowDto {
+    employeeId: number;
+    fullName: string;
+    positionTitle: string;
+
+    totalWorkedHours: number;
+    totalShortcomingMinutes: number;
+    totalOvertimeMinutes: number;
+
+    standardStartTime?: string;
+    standardEndTime?: string;
+
+    days: Record<string, GridDayDto>;
+}
+
+export interface AttendanceGridResponseDto {
+    fromDate: string;
+    toDate: string;
+    totalWorkingDays: number;
+    rows: EmployeeGridRowDto[];
+}
+
+export interface SingleAttendanceRecordDto {
+    id?: number;
+    employeeId: number;
+    employeeName: string;
+    date: string;
+
+    actualCheckIn?: string;
+    actualCheckOut?: string;
+    status: AttendanceStatus;
+
+    expectedStartTime?: string;
+    expectedEndTime?: string;
+
+    durationMinutes: number;
+    lateMinutes: number;
+    earlyLeaveMinutes: number;
+    totalShortcomingMinutes: number;
+    overtimeMinutes: number;
+}
+
+export interface AttendanceUpdateDto {
+    employeeId: number;
+    date: string;
+    checkIn?: string | null;
+    checkOut?: string | null;
+}
 
 export interface Department {
     id: number;
