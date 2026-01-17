@@ -27,6 +27,7 @@ interface LoginResponse {
     email: string;
     roles: string[];
     employeeId: number | null;
+    name: string
 }
 
 const loginUser = async (credentials: LoginFormData): Promise<LoginResponse> => {
@@ -51,6 +52,7 @@ export const LoginPage = () => {
                 username: data.username,
                 roles: data.roles,
                 employeeId: data.employeeId,
+                name: data.name
             };
 
             login(user, data.token);
