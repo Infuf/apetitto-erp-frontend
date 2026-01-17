@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {NavLink, Outlet} from 'react-router-dom';
 import {
     AppBar as MuiAppBar,
@@ -47,7 +47,9 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ClassIcon from '@mui/icons-material/Class';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import {Can} from './Can.tsx';
-import {funnyTitles} from '../constants/titles';
+import {desktopQuotes, mobileQuotes} from "../constants/quotes.ts";
+import {useWindowSize} from 'react-use';
+import Confetti from 'react-confetti';
 
 const drawerWidth = 240;
 
@@ -155,16 +157,88 @@ export const Layout = () => {
 
     const [open, setOpen] = useState(true);
     const [mobileOpen, setMobileOpen] = useState(false);
-
-    const [title, setTitle] = useState(() => funnyTitles[Math.floor(Math.random() * funnyTitles.length)]);
+    const [, setClickCount] = useState(0);
+    const [nextConfettiAt, setNextConfettiAt] = useState(
+        Math.floor(Math.random() * (40 - 20 + 1)) + 20
+    );
+    const [showConfetti, setShowConfetti] = useState(false);
     const [openDirectory, setOpenDirectory] = useState(true);
+    const [displayTitle, setDisplayTitle] = useState('');
+    const typingRef = useRef<number | null>(null);
+    const [showCursor, setShowCursor] = useState(false);
+    const {width, height} = useWindowSize();
+    useEffect(() => {
+        if (!showCursor) return;
 
-    const handleChangeTitle = () => {
-        let newTitle = title;
-        while (newTitle === title) {
-            newTitle = funnyTitles[Math.floor(Math.random() * funnyTitles.length)];
-        }
-        setTitle(newTitle);
+        const cursorInterval = setInterval(() => {
+            setDisplayTitle(prev => {
+                if (prev.endsWith('|')) return prev.slice(0, -1);
+                return prev + '|';
+            });
+        }, 500);
+
+        return () => clearInterval(cursorInterval);
+    }, [showCursor]);
+
+    useEffect(() => {
+        const randomQuote = desktopQuotes[Math.floor(Math.random() * desktopQuotes.length)];
+
+        const text = randomQuote.text.replace('{name}', user?.name || '');
+
+        typeText(text);
+    }, []);
+
+    const typeText = (text: string) => {
+        if (typingRef.current) clearInterval(typingRef.current);
+
+        const speed = Math.floor(Math.random() * (80 - 40 + 1)) + 40;
+
+        let index = 0;
+        let current = '';
+
+        setDisplayTitle('');
+        setShowCursor(true);
+
+        typingRef.current = window.setInterval(() => {
+            if (index >= text.length) {
+                clearInterval(typingRef.current!);
+                typingRef.current = null;
+                setDisplayTitle(current + '|');
+                return;
+            }
+
+            current += text.charAt(index);
+            setDisplayTitle(current + '|');
+            index++;
+        }, speed);
+    };
+    useEffect(() => {
+        if (!showConfetti) return;
+        const timer = setTimeout(() => setShowConfetti(false), 15000);
+        return () => clearTimeout(timer);
+    }, [showConfetti]);
+
+    const handleAvatarClick = () => {
+        const quotes = isMobile ? mobileQuotes : desktopQuotes;
+        const random = quotes[Math.floor(Math.random() * quotes.length)];
+
+        const preparedText = random.text.replace(
+            '{name}',
+            user?.name ?? 'do‘stim'
+        );
+        setClickCount(prev => {
+            const newCount = prev + 1;
+
+            if (newCount >= nextConfettiAt) {
+                setShowConfetti(true);
+                setNextConfettiAt(Math.floor(Math.random() * (40 - 20 + 1)) + 20);
+                return 0;
+            }
+
+            return newCount;
+        });
+
+        typeText(preparedText);
     };
 
     const handleDrawerToggle = () => {
@@ -314,23 +388,42 @@ export const Layout = () => {
                         color="inherit"
                         aria-label="open drawer"
                         onClick={handleDrawerToggle}
-                        sx={{marginRight: '36px', ...(open && !isMobile && {display: 'none'})}}
+                        sx={{
+                            marginRight: isMobile ? 0 : '36px',
+                            marginLeft: -2,
+                            ...(open && !isMobile && {display: 'none'}),
+                        }}
                     >
                         <MenuIcon/>
                     </IconButton>
-                    <Avatar src={logo} sx={{width: 40, height: 40, mr: 2}}/>
+                    <Avatar
+                        src={logo}
+                        sx={{width: 40, height: 40, mr: 2, cursor: 'pointer'}}
+                        onClick={handleAvatarClick}
+                    />
                     <Typography
                         component="h1"
-                        variant="h6"
+                        variant={isMobile ? 'body1' : 'h6'}
                         color="inherit"
-                        noWrap
-                        sx={{flexGrow: 1, cursor: 'pointer', userSelect: 'none'}}
-                        onClick={handleChangeTitle}
+                        noWrap={false}
+                        sx={{
+                            flexGrow: 1,
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word',
+                        }}
+                        onClick={handleAvatarClick}
                     >
-                        {title}
+                        {displayTitle}
                     </Typography>
                     {!isMobile && <Typography sx={{mr: 2}}>{user?.username}</Typography>}
-                    <Button color="inherit" onClick={logout}>Выход</Button>
+                    {!isMobile && (
+                        <Button color="inherit" onClick={logout}>
+                            Выход
+                        </Button>
+                    )}
                 </Toolbar>
             </AppBar>
 
@@ -361,6 +454,7 @@ export const Layout = () => {
                     <Outlet/>
                 </Box>
             </Box>
+            {showConfetti && <Confetti width={width} height={height}/>}
         </Box>
     );
 };

@@ -3,6 +3,7 @@ export interface User {
     username: string;
     roles: string[];
     employeeId: number | null;
+    name: string;
 }
 
 export interface AuthContextType {
