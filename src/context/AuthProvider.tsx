@@ -45,6 +45,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
                     id: 0,
                     username: decoded.sub,
                     roles: [],
+                    name: 'Isimsiz inson',
                     employeeId: null
                 });
             }
