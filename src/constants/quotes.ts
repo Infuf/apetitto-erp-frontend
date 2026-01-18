@@ -426,6 +426,7 @@ export const mobileQuotes = [
     { "text": "{name}, siz kuchlisiz, hammasiga ulgurasiz." },
     { "text": "{name}, qorningiz ochdimi? Menga ham." },
     { "text": "{name}, bugun tabassumingiz bilan hammani yiqitasiz." },
+    { "text": "{name}, Bormi og'riq?" },
 
     { "text": "Parhez — dushanba kuni boshlanib, seshanbada tugaydigan narsa." },
     { "text": "Agar shokolad sabzavot bo‘lganda edi, dunyo go‘zal bo‘lardi." },

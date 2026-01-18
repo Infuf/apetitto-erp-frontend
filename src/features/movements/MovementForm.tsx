@@ -3,11 +3,13 @@ import {
     Autocomplete,
     Box,
     Button,
+    Checkbox,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControlLabel,
     IconButton,
     Paper,
     Table,
@@ -66,6 +68,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
     const [accountId, setAccountId] = useState<number | null>(null);
     const [comment, setComment] = useState('');
     const [items, setItems] = useState<MovementItem[]>([]);
+    const [isForShipment, setIsForShipment] = useState(false);
 
     const [productSearchInput, setProductSearchInput] = useState('');
     const [debouncedProductInput, setDebouncedProductInput] = useState('');
@@ -108,11 +111,13 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
             setQuantity(1);
             setCostPrice('');
             setProductSearchInput('');
+            setIsForShipment(false);
         }
     }, [open]);
 
     useEffect(() => {
         setAccountId(null);
+        setIsForShipment(false);
     }, [movementType]);
 
     const filteredAccounts = useMemo(() => {
@@ -186,7 +191,8 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
             movementType,
             comment,
             items: itemsToSubmit,
-            financeAccountId: accountId ?? undefined
+            financeAccountId: accountId ?? undefined,
+            isForShipment: isForShipment
         });
     };
 
@@ -233,6 +239,20 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                         fullWidth
                     />
                 </Box>
+
+                {movementType === 'OUTBOUND' && accountId && (
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={isForShipment}
+                                onChange={(e) => setIsForShipment(e.target.checked)}
+                                color="primary"
+                            />
+                        }
+                        label="Авто-приход и отгрузка"
+                        sx={{whiteSpace: 'nowrap'}}
+                    />
+                )}
 
                 <Typography variant="h6" gutterBottom>Товары</Typography>
 

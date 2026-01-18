@@ -32,11 +32,8 @@ const RootRedirect = () => {
         return <Navigate to="/analytics" replace />;
     }
 
-    if (user?.employeeId) {
-        return <Navigate to={`/hr/employees/${user.employeeId}`} replace />;
-    }
+    return <Navigate to={`/hr/employees/${user?.employeeId}`} replace/>;
 
-    return <Navigate to="/transfers" replace />;
 };
 
 export const AppRoutes = () => {
