@@ -19,6 +19,7 @@ export interface StockMovementRequestDto {
         costPrice?: number;
     }[];
     financeAccountId?: number | null;
+    isForShipment: boolean;
 }
 
 
