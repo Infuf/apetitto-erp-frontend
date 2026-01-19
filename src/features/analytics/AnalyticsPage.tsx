@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { Box, Typography, Tabs, Tab, Paper } from '@mui/material';
+import {useState} from 'react';
+import {Box, Paper, Tab, Tabs, Typography} from '@mui/material';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
+import HandshakeIcon from '@mui/icons-material/Handshake';
 
-import { FinanceAnalyticsTab } from './tabs/finance/FinanceAnalyticsTab.tsx';
-import { WarehouseAnalyticsTab } from './tabs/WarehouseAnalyticsTab';
+import {FinanceAnalyticsTab} from './tabs/finance/FinanceAnalyticsTab.tsx';
+import {WarehouseAnalyticsTab} from './tabs/WarehouseAnalyticsTab';
+import {PartnersAnalyticsTab} from "./tabs/finance/PartnersAnalyticsTab.tsx";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -38,7 +40,7 @@ export const AnalyticsPage = () => {
                 >
                     <Tab icon={<PieChartIcon />} iconPosition="start" label="Где бабки?" />
                     <Tab icon={<WarehouseIcon />} iconPosition="start" label="Склад - кладбище денег" />
-                    {/* Сюда можно будет добавить HR, Продажи и т.д. */}
+                    <Tab icon={<HandshakeIcon/>} iconPosition="start" label="Партнеры"/>
                 </Tabs>
             </Paper>
 
@@ -48,6 +50,10 @@ export const AnalyticsPage = () => {
 
             <TabPanel value={tabValue} index={1}>
                 <WarehouseAnalyticsTab />
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={2}>
+                <PartnersAnalyticsTab/>
             </TabPanel>
         </Box>
     );

@@ -3,7 +3,7 @@ import { axiosInstance } from '../../../api/axiosInstance';
 import type {
     CompanyFinancialStateDto,
     IncomeReportDto,
-    ExpenseReportDto
+    ExpenseReportDto, PartnersAnalysisReportDto
 } from '../types';
 
 interface DateRangeParams {
@@ -27,8 +27,31 @@ const fetchExpenseReport = async (params: DateRangeParams): Promise<ExpenseRepor
     return data;
 };
 
+interface PartnerAnalysisParams {
+    dateFrom: string;
+    dateTo: string;
+    isSupplier: boolean;
+}
+
+const fetchPartnerAnalysis = async ({ dateFrom, dateTo, isSupplier }: PartnerAnalysisParams): Promise<PartnersAnalysisReportDto> => {
+    const { data } = await axiosInstance.get('/finance/dashboard/partners/analysis', {
+        params: { dateFrom, dateTo, isSupplier }
+    });
+    return data;
+};
+
 
 export const useFinanceAnalytics = () => {
+
+    const usePartnerAnalysis = (dateFrom: string, dateTo: string, reportType: 'SUPPLIER' | 'DEALER' | null) => useQuery({
+        queryKey: ['partnerAnalysis', dateFrom, dateTo, reportType],
+        queryFn: () => fetchPartnerAnalysis({
+            dateFrom,
+            dateTo,
+            isSupplier: reportType === 'SUPPLIER'
+        }),
+        enabled: !!dateFrom && !!dateTo && reportType !== null,
+    });
 
     const useCompanyState = () => useQuery({
         queryKey: ['financeDashboardState'],
@@ -49,6 +72,7 @@ export const useFinanceAnalytics = () => {
     });
 
     return {
+        usePartnerAnalysis,
         useCompanyState,
         useIncomeReport,
         useExpenseReport
