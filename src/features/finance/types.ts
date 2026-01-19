@@ -166,3 +166,26 @@ export interface IncomeReportDto {
     totalIncome: number;
     categories: CategoryIncomeDto[];
 }
+
+export interface PartnerProductDto {
+    productName: string;
+    unit: string;
+    quantity: number;
+    amount: number;
+    averagePrice: number;
+}
+
+export interface PartnerDto {
+    partnerId: number;
+    partnerName: string;
+    totalAmount: number;
+    totalQuantity: number;
+    shareInGrandTotal: number;
+    products: PartnerProductDto[];
+}
+
+export interface PartnersAnalysisReportDto {
+    grandTotalAmount: number;
+    grandTotalQuantity: number;
+    partners: PartnerDto[];
+}
