@@ -77,6 +77,14 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
     const [quantity, setQuantity] = useState<number | ''>(1);
     const [costPrice, setCostPrice] = useState<number | ''>('');
 
+    const totalInboundSum = useMemo(() => {
+        if (movementType !== 'INBOUND') return 0;
+
+        return items.reduce((sum, item) => {
+            return sum + (item.costPrice ?? 0) * item.quantity;
+        }, 0);
+    }, [items, movementType]);
+
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedProductInput(productSearchInput);
@@ -325,6 +333,7 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                                 <TableCell>Артикул</TableCell>
                                 <TableCell>Наименование</TableCell>
                                 {movementType === 'INBOUND' && <TableCell align="right">Себестоимость</TableCell>}
+                                {movementType === 'INBOUND' && <TableCell align="right">Сумма</TableCell>}
                                 {movementType === 'OUTBOUND' && <TableCell align="right">Цена продажи</TableCell>}
                                 <TableCell align="right">{quantityLabel}</TableCell>
                                 <TableCell align="center">Действия</TableCell>
@@ -337,6 +346,11 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                                     <TableCell>{item.productName}</TableCell>
                                     {movementType === 'INBOUND' &&
                                         <TableCell align="right">{formatCurrency(item.costPrice)}</TableCell>}
+                                    {movementType === 'INBOUND' && (
+                                        <TableCell align="right">
+                                            {formatCurrency((item.costPrice ?? 0) * item.quantity)}
+                                        </TableCell>
+                                    )}
                                     {movementType === 'OUTBOUND' &&
                                         <TableCell align="right">{formatCurrency(item.sellingPrice)}</TableCell>}
                                     <TableCell align="right">{item.quantity}</TableCell>
@@ -347,6 +361,22 @@ export const MovementForm = ({open, onClose, onSubmit, isSubmitting, movementTyp
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            {movementType === 'INBOUND' && items.length > 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={3} />
+                                    <TableCell align="right">
+                                        <Typography fontWeight="bold">
+                                            Итого:
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Typography fontWeight="bold">
+                                            {formatCurrency(totalInboundSum)}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell />
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
