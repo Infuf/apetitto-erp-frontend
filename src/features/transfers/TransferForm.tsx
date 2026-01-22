@@ -76,6 +76,7 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
     const [selectedProduct, setSelectedProduct] = useState<ProductOption | null>(null);
     const [quantity, setQuantity] = useState<number | ''>(1);
     const [isAutoInbound, setIsAutoInbound] = useState<boolean>(true);
+    const AUTO_INBOUND_WAREHOUSE_NAME = 'TAYYOR MAXSULOTLAR OMBORI';
 
     const totalOrderSum = useMemo(() => {
         return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -90,6 +91,17 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
         queryKey: ['warehouses'],
         queryFn: fetchWarehouses,
     });
+    const sourceWarehouse = warehouses.find(w => w.id === sourceWarehouseId);
+    const isAutoInboundAllowed =
+        sourceWarehouse?.name === AUTO_INBOUND_WAREHOUSE_NAME
+
+    useEffect(() => {
+        if (isAutoInboundAllowed) {
+            setIsAutoInbound(true);
+        } else {
+            setIsAutoInbound(false);
+        }
+    }, [isAutoInboundAllowed]);
 
     const {data: productOptions = [], isLoading: isLoadingProducts} = useQuery({
         queryKey: ['productSearch', debouncedProductInput],
@@ -197,10 +209,18 @@ export const TransferForm = ({open, onClose, onSubmit, isSubmitting}: TransferFo
                         renderInput={(params) => <TextField {...params} label="Склад-получатель"/>}
                     />
                 </Box>
-                <FormControlLabel
-                    control={<Switch checked={isAutoInbound} onChange={(e) => setIsAutoInbound(e.target.checked)}/>}
-                    label="Автоматически оприходовать товар на склад-отправитель"
-                />
+
+                {isAutoInboundAllowed && (
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={isAutoInbound}
+                                onChange={(e) => setIsAutoInbound(e.target.checked)}
+                            />
+                        }
+                        label="Автоматически оприходовать товар на склад-отправитель"
+                    />
+                )}
 
                 <Typography variant="h6" gutterBottom>2. Добавьте товары</Typography>
                 <Paper elevation={2} sx={{p: 2, display: 'flex', gap: 2, alignItems: 'center', mb: 2}}>
