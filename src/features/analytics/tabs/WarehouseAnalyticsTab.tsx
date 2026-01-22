@@ -56,7 +56,8 @@ export const WarehouseAnalyticsTab = () => {
         refetch: refetchValuation
     } = useStockValuation(valuationIds);
 
-    const incomingIds = incomingWarehouses.length > 0 ? incomingWarehouses.map(w => w.id) : undefined;
+    const incomingIds = incomingWarehouses.map(w => w.id);
+
     const {
         data: incomingData,
         isLoading: isIncomingLoading,

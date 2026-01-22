@@ -47,7 +47,7 @@ export const useWarehouseAnalytics = () => {
     const useIncomingReport = (dateFrom: string, dateTo: string, warehouseIds?: number[]) => useQuery({
         queryKey: ['incomingReport', dateFrom, dateTo, warehouseIds],
         queryFn: () => fetchIncomingReport({dateFrom, dateTo, destinationWarehouseIds: warehouseIds}),
-        enabled: !!dateFrom && !!dateTo,
+        enabled: !!dateFrom && !!dateTo && !!warehouseIds?.length,
     });
 
     return {
