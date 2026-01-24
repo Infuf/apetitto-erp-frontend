@@ -21,6 +21,7 @@ import {DepartmentsPage} from "..//features/hr/structure/DepartmentsPage.tsx"
 import {EmployeesPage} from "../features/hr/personnel/EmployeePage.tsx";
 import {EmployeeProfilePage} from "../features/hr/personnel/EmployeeProfilePage.tsx";
 import {AttendanceGridPage} from "../features/hr/attendance/components/AttendanceGridPage.tsx";
+import {PayrollPage} from '../features/hr/payroll/PayrollPage'
 
 const RootRedirect = () => {
     const { user } = useAuth();
@@ -66,6 +67,7 @@ export const AppRoutes = () => {
                     <Route path="/hr/employees" element={<EmployeesPage/>}/>
                     <Route path="/hr/employees/:id" element={<EmployeeProfilePage />} />
                     <Route path="/hr/attendance" element={<AttendanceGridPage/>}/>
+                    <Route path="/hr/payroll" element={<PayrollPage/>}/>
 
                     <Route path="/admin/users" element={<UsersPage/>}/>
 

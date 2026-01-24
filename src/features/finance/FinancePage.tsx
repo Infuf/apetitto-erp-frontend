@@ -328,7 +328,18 @@ export const FinancePage = () => {
                         paginationModel={paginationModel}
                         onPaginationModelChange={setPaginationModel}
                         disableRowSelectionOnClick
-                        sx={{'& .MuiDataGrid-columnHeaders': {bgcolor: '#f5f5f5'}}}
+                        getRowClassName={(params) =>
+                            params.row.status === 'CANCELLED' ? 'row-cancelled' : ''
+                        }
+                        sx={{
+                            '& .MuiDataGrid-columnHeaders': { bgcolor: '#f5f5f5' },
+
+                            '& .row-cancelled': {
+                                opacity: 0.45,
+                                filter: 'grayscale(100%)',
+                                pointerEvents: 'auto'
+                            }
+                        }}
                     />
             </Box>
 

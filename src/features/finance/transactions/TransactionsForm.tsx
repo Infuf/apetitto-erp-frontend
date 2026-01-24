@@ -36,6 +36,7 @@ const operationTypesList: { value: TransactionType; label: string }[] = [
     {value: 'PAYMENT_TO_SUPP', label: 'Оплата поставщику'},
     {value: 'PAYMENT_FROM_DLR', label: 'Оплата от дилера'},
     {value: 'OWNER_WITHDRAW', label: 'Вывод средств'},
+    {value: 'SALARY_PAYOUT', label: 'Зарплата & Авансики'},
 ];
 
 export const TransactionForm = ({
