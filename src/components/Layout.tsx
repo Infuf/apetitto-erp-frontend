@@ -50,6 +50,7 @@ import {Can} from './Can.tsx';
 import {desktopQuotes, mobileQuotes} from "../constants/quotes.ts";
 import {useWindowSize} from 'react-use';
 import Confetti from 'react-confetti';
+import PaymentsIcon from '@mui/icons-material/Payments';
 
 const drawerWidth = 240;
 
@@ -142,6 +143,12 @@ const hrItems = [
         path: '/hr/attendance',
         icon: <CalendarMonthIcon/>,
         roles: ['ROLE_ADMIN', 'ROLE_HR', 'ROLE_MANAGER']
+    },
+    {
+        text: 'Даа, фух',
+        path: '/hr/payroll',
+        icon: <PaymentsIcon/>,
+        roles: ['ROLE_ADMIN', 'ROLE_HR']
     },
 ];
 
