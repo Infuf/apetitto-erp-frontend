@@ -29,6 +29,55 @@ export const AttendanceCell = ({ dayData, onClick }: AttendanceCellProps) => {
     const checkIn = dayData?.checkIn ? dayData.checkIn.substring(0, 5) : '';
     const checkOut = dayData?.checkOut ? dayData.checkOut.substring(0, 5) : '';
 
+    const calcWorkMinutes = (checkIn?: string, checkOut?: string): number | null => {
+        if (!checkIn || !checkOut) return null;
+
+        const [inH, inM] = checkIn.split(':').map(Number);
+        const [outH, outM] = checkOut.split(':').map(Number);
+
+        if ([inH, inM, outH, outM].some(isNaN)) return null;
+
+        const inMinutes = inH * 60 + inM;
+        const outMinutes = outH * 60 + outM;
+
+        return outMinutes >= inMinutes
+            ? outMinutes - inMinutes
+            : outMinutes + 1440 - inMinutes;
+    };
+
+    const requiresAttention = (day?: GridDayDto) => {
+        if (!day || day.status !== 'PRESENT') return false;
+
+        const hasCheckIn = Boolean(day.checkIn);
+        const hasCheckOut = Boolean(day.checkOut);
+
+        if (hasCheckIn && !hasCheckOut) return true;
+        if (!hasCheckIn && hasCheckOut) return true;
+
+        if (hasCheckIn && hasCheckOut) {
+            const minutes = calcWorkMinutes(day.checkIn!, day.checkOut!);
+            if (minutes !== null && minutes < 60) return true;
+        }
+
+        return false;
+    };
+    const needsAttention = requiresAttention(dayData);
+
+    const attentionGradient = `
+        linear-gradient(
+            90deg,
+            rgba(255, 0, 0, 0.55),
+            rgba(255, 193, 7, 0.55),
+            rgba(0, 188, 212, 0.55),
+            rgba(156, 39, 176, 0.55),
+            rgba(255, 0, 0, 0.55) 
+        )
+    `;
+
+
+
+
+
     let tooltipTitle = '';
     if (dayData) {
         if (isPresent) {
@@ -45,9 +94,9 @@ export const AttendanceCell = ({ dayData, onClick }: AttendanceCellProps) => {
             <Box
                 onClick={onClick}
                 sx={{
-                    width: 54,  // Чуть шире для удобства
-                    height: 48, // Чуть выше
-                    borderRadius: 1, // Мягкий квадрат
+                    width: 54,
+                    height: 48,
+                    borderRadius: 1,
                     bgcolor: isFuture ? '#f9f9f9' : bgColor,
                     display: 'flex',
                     flexDirection: 'column',
@@ -55,11 +104,25 @@ export const AttendanceCell = ({ dayData, onClick }: AttendanceCellProps) => {
                     justifyContent: 'center',
                     cursor: 'pointer',
                     border: '1px solid #eee',
-                    // Цветная полоска снизу для быстрой оценки статуса
                     borderBottom: `3px solid ${getBorderColor(dayData)}`,
-                    transition: 'all 0.1s',
-                    '&:hover': { filter: 'brightness(0.95)', zIndex: 1 },
-                    '&:active': { transform: 'scale(0.95)' }
+                    position: 'relative',
+                    overflow: 'hidden',
+
+                    ...(needsAttention && {
+                        backgroundImage: attentionGradient,
+                        backgroundSize: '500% 100%',
+                        animation: 'attentionRainbow 2s ease-in-out infinite',
+                    }),
+
+                    '&:hover': {
+                        filter: 'brightness(0.9)',
+                        zIndex: 1,
+                    },
+
+                    '@keyframes attentionRainbow': {
+                        '0%': { backgroundPosition: '0% 50%' },
+                        '100%': { backgroundPosition: '100% 50%' },
+                    },
                 }}
             >
                 {isPresent ? (
