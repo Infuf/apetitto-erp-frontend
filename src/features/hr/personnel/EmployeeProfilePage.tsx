@@ -48,7 +48,7 @@ interface DetailBadgeProps {
 }
 
 
-const HIDE_THRESHOLD = 1000000;
+const HIDE_THRESHOLD = 5000000;
 
 const LABELS = {
     workedDays: 'Ишлаган кунлари',
