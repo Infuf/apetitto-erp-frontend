@@ -84,7 +84,16 @@ export const TransactionForm = ({
         const category = categories.find(c => c.id === selectedCategoryId);
         return category?.subcategories || [];
     }, [categories, selectedCategoryId]);
+    const selectedFromAccountId = watch('fromAccountId');
+    const selectedToAccountId = watch('toAccountId');
 
+    const selectedFromAccount = useMemo(() => {
+        return accounts.find(acc => acc.id === selectedFromAccountId);
+    }, [accounts, selectedFromAccountId]);
+
+    const selectedToAccount = useMemo(() => {
+        return accounts.find(acc => acc.id === selectedToAccountId);
+    }, [accounts, selectedToAccountId]);
 
     useEffect(() => {
         setValue('fromAccountId', null);
@@ -151,6 +160,19 @@ export const TransactionForm = ({
                                     fullWidth
                                     error={!!errors.amount}
                                     helperText={errors.amount?.message}
+                                    onKeyDown={(e) => {
+                                        if (e.key !== 'Tab') return;
+
+                                        if (operationType === 'PAYMENT_FROM_DLR' && selectedFromAccount) {
+                                            e.preventDefault();
+                                            setValue('amount', Math.abs(selectedFromAccount.balance));
+                                        }
+
+                                        if (operationType === 'SALARY_PAYOUT' && selectedToAccount) {
+                                            e.preventDefault();
+                                            setValue('amount', Math.abs(selectedToAccount.balance));
+                                        }
+                                    }}
                                     InputProps={{
                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         inputComponent: NumericFormatCustom as any,
