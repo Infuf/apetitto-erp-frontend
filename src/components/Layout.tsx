@@ -26,6 +26,7 @@ import {useAuth} from '../context/useAuth.ts';
 import logo from '../assets/logo.jpg';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import type {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import type {DrawerProps as MuiDrawerProps} from '@mui/material/Drawer';
@@ -380,6 +381,19 @@ export const Layout = () => {
                         </ListItemButton>
                     </Can>
                 ))}
+                {isMobile && (
+                    <ListItemButton
+                        onClick={() => {
+                            logout();
+                            setMobileOpen(false);
+                        }}
+                    >
+                        <ListItemIcon>
+                            <LogoutIcon color="error"/>
+                        </ListItemIcon>
+                        <ListItemText primary="Выход"/>
+                    </ListItemButton>
+                )}
             </List>
         </>
     );
