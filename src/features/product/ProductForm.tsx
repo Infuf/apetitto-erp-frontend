@@ -64,7 +64,40 @@ export const ProductForm = ({
 
     const resolver = zodResolver(productSchema) as unknown as Resolver<ProductFormData>;
 
-    const {register, handleSubmit, formState: {errors}, reset, control} =
+    const handleFormSubmit = async (data: ProductFormData) => {
+        try {
+            await onSubmit(data);
+        } catch (error: any) {
+            if (error.response?.status === 409) {
+                const message: string = error.response.data.error;
+
+                if (message.includes('uk_product_name')) {
+                    setError('name', {
+                        type: 'server',
+                        message: 'Товар с таким названием уже существует'
+                    });
+                }
+
+                if (message.includes('uk_product_code')) {
+                    setError('productCode', {
+                        type: 'server',
+                        message: 'Артикул уже существует'
+                    });
+                }
+
+                if (message.includes('uk_product_barcode')) {
+                    setError('barcode', {
+                        type: 'server',
+                        message: 'Штрих-код уже существует'
+                    });
+                }
+            } else {
+                console.error(error);
+            }
+        }
+    };
+
+    const {register, handleSubmit, formState: {errors}, reset, control, setError} =
         useForm<ProductFormData>({
             resolver,
             defaultValues: {
@@ -100,7 +133,7 @@ export const ProductForm = ({
         <Dialog
             open={open}
             onClose={onClose}
-            PaperProps={{component: 'form', onSubmit: handleSubmit(onSubmit)}}
+            PaperProps={{component: 'form', onSubmit: handleSubmit(handleFormSubmit)}}
             maxWidth="sm"
             fullWidth
         >
@@ -126,22 +159,28 @@ export const ProductForm = ({
                         helperText={errors.productCode?.message}
                         disabled={isSubmitting}
                     />
-                    <TextField
-                        select
-                        label="Ед. изм."
-                        fullWidth
-                        defaultValue="PIECE"
-                        {...register('unit')}
-                        error={!!errors.unit}
-                        helperText={errors.unit?.message}
-                        disabled={isSubmitting}
-                    >
-                        {unitOptions.map(option => (
-                            <MenuItem key={option} value={option}>
-                                {option}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+                    <Controller
+                        name="unit"
+                        control={control}
+                        render={({field, fieldState}) => (
+                            <TextField
+                                select
+                                label="Ед. изм."
+                                fullWidth
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={!!fieldState.error}
+                                helperText={fieldState.error?.message}
+                                disabled={isSubmitting}
+                            >
+                                {unitOptions.map(option => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        )}
+                    />
                 </Box>
 
                 <Box sx={{mt: 2}}>
@@ -187,13 +226,16 @@ export const ProductForm = ({
                         control={control}
                         render={({field}) => (
                             <TextField
-                                {...field}
                                 label="Цена продажи"
                                 fullWidth
+                                value={field.value ?? ''}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    field.onChange(value === '' ? undefined : Number(value));
+                                }}
                                 error={!!errors.sellingPrice}
                                 helperText={errors.sellingPrice?.message}
                                 InputProps={{
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     inputComponent: NumericFormatCustom as any,
                                 }}
                                 disabled={isSubmitting}
