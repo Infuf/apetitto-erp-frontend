@@ -469,7 +469,7 @@ export const Layout = () => {
                 </DesktopDrawer>
             )}
 
-            <Box component="main" sx={{flexGrow: 1, minheight: '100vh'}}>
+            <Box component="main" sx={{flexGrow: 1, minHeight: '100vh'}}>
                 <Toolbar/>
                 <Box sx={{p: isMobile ? 2 : 3}}>
                     <Outlet/>
